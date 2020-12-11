@@ -1,0 +1,54 @@
+{
+
+    "inputs": [
+        {
+            "description": "Select a build configuration for the executable",
+            "type": "pickString",
+            "id": "buildConfig",
+            "options": [
+                {
+                    "label": "Debug",
+                    "value": "Debug",
+                },
+                {
+                    "label": "Release",
+                    "value": "Release",
+                },
+                {
+                    "label": "Release with debug info",
+                    "value": "RelWithDebInfo",
+                },
+                {
+                    "label": "Minimum size release",
+                    "value": "MinSizeRel"
+                }
+            ]
+        }
+    ],
+    "options": {
+        "cwd": "${workspaceFolder}/../"
+    },
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Generate project files",
+            "type": "shell",
+            "command": "Build/BatchFiles/GenerateProjectFiles.bat",
+            "args": [
+                "${input:buildConfig}",
+            ],
+            "problemMatcher": [],
+        },
+        {
+            "label": "Build",
+            "type": "shell",
+            "command": "Build/BatchFiles/Build.bat",
+            "problemMatcher": "$gcc",
+            "dependsOn": "Generate project files",
+            "args": [
+                "OpenGLTutoriol"
+            ],
+            "detail": "Builds OpenGLTutoriol target"
+        }
+    ]
+}

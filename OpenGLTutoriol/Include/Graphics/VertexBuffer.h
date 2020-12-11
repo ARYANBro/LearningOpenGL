@@ -1,0 +1,67 @@
+#pragma once
+
+#include <vector>
+#include <memory>
+#include <cassert>
+
+#include "glad/glad.h"
+
+enum class LayoutDataType
+{
+    Float = 1, Float2 = 2, Float3 = 3
+};
+
+struct BufferLayout
+{
+public:
+    BufferLayout() noexcept = default;
+    BufferLayout(std::initializer_list<LayoutDataType> initList) noexcept
+        : mElements()
+    {
+        GLint maxVertexAttribs;
+        glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &maxVertexAttribs);
+        
+        mElements.reserve(static_cast<std::size_t>(maxVertexAttribs));
+
+        for (const auto element : initList)
+        {
+            mElements.push_back(element);
+        }
+    }
+    
+    LayoutDataType& operator[](std::size_t index) noexcept
+    {
+        assert(index <= GetSize());
+        return mElements[index];
+    }
+
+    const LayoutDataType& operator[](std::size_t index) const noexcept
+    {
+        assert(index <= GetSize());
+        return mElements[index];
+    }
+
+    std::size_t GetSize() const { return mElements.size(); }
+private:
+    std::vector<LayoutDataType> mElements;
+};
+
+class VertexBuffer
+{
+public:
+    VertexBuffer(std::size_t size) noexcept;
+    VertexBuffer(const void* data, std::size_t size) noexcept;
+    ~VertexBuffer() noexcept;
+
+    void Bind() const noexcept;
+    void Unbind() const noexcept;
+
+    void SetData(const void* data, std::size_t size) noexcept;
+    void SetLayout(const BufferLayout& layout) noexcept { mVertexLayout = layout; }
+
+    constexpr const BufferLayout& GetLayout() const noexcept { return mVertexLayout; }
+
+private:
+    unsigned int mRendererID;
+    BufferLayout mVertexLayout;
+};

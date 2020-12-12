@@ -2,10 +2,9 @@
 
 #include "Application.h"
 
-#include "Graphics/VertexBuffer.h"
-#include "Graphics/ElementBuffer.h"
 #include "Graphics/VertexArray.h"
 #include "Graphics/Shader.h"
+#include "Graphics/Texture.h"
 
 class OpenGLApplication : public Application
 {
@@ -18,4 +17,10 @@ private:
     VertexArray mVao;
     
     Shader mShader;
+    Texture mFabricTexture;
+    Texture mPavingStonesTexture;
+
+private:
+    void InitBuffers() noexcept;
+    void LoadAssets() noexcept;
 };

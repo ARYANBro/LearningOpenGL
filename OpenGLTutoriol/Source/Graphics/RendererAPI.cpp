@@ -1,53 +1,27 @@
 #include "Graphics/RendererAPI.h"
 
-#include "Graphics/Shader.h"
-
 #include <unordered_map>
 #include <stdexcept>
 #include <cassert>
 #include <memory>
 
-struct ShaderTypeAndNamesImpl
+static std::string ShaderTypeToString(GLenum shaderType) noexcept
 {
-public:
-    static std::optional<std::string> ShaderTypeToString(GLenum shaderType) noexcept
+    switch (shaderType)
     {
-        if (const auto shaderName = sShaderTypeAndNames.find(shaderType); shaderName != sShaderTypeAndNames.end())
-        {
-            return shaderName->second;
-        }
+    case GL_VERTEX_SHADER:
+        return "vertex";
+    
+    case GL_FRAGMENT_SHADER:
+        return "fragment";
 
-        return std::nullopt;
+    default:
+        return "null";
+        assert(false);
     }
+}
 
-    static std::optional<GLenum> StringToShaderType(const std::string& shaderName) noexcept
-    {
-        auto shaderType = std::find_if(sShaderTypeAndNames.begin(), sShaderTypeAndNames.end(), [&shaderName](const std::pair<GLenum, const char*>& shaderTypeAndName)
-        {
-            return shaderTypeAndName.second == shaderName;
-        });
-
-        if (shaderType != sShaderTypeAndNames.end())
-        {
-            return shaderType->first;
-        }
-
-        return std::nullopt;
-    }
-
-private:
-    static const std::unordered_map<GLenum, const char*> sShaderTypeAndNames;
-};
-
-const std::unordered_map<GLenum, const char*> ShaderTypeAndNamesImpl::sShaderTypeAndNames = {
-    { GL_VERTEX_SHADER, "vertex" },
-    { GL_FRAGMENT_SHADER, "fragment" }
-};
-
-using GetivFunction = void (*)(GLuint, GLenum, GLint*);
-using GetInfoLogFunction = void (*)(GLuint, GLsizei, GLsizei*, GLchar*);
-
-static std::string GetInfoLog(GLuint object, const GetivFunction& getivFunction, const GetInfoLogFunction& getInfoLogFunction) noexcept
+static std::string GetInfoLog(GLuint object, void (*getivFunction)(GLuint, GLenum, GLint*), void (*getInfoLogFunciotion)(GLuint, GLsizei, GLsizei*, GLchar*)) noexcept
 {
     assert(object != 0);
     GLint logLength;
@@ -56,19 +30,9 @@ static std::string GetInfoLog(GLuint object, const GetivFunction& getivFunction,
     const auto logInfo = std::make_unique<GLchar[]>(static_cast<size_t>(logLength));
     GLchar* logInfoData = logInfo.get();
         
-    getInfoLogFunction(object, logLength, nullptr, logInfoData);
+    getInfoLogFunciotion(object, logLength, nullptr, logInfoData);
 
     return logInfoData;
-}
-
-std::optional<std::string> RendererAPI::ShaderTypeToString(GLenum shaderType) noexcept
-{
-    return ShaderTypeAndNamesImpl::ShaderTypeToString(shaderType);
-}
-
-std::optional<GLenum> RendererAPI::StringToShaderType(const std::string& shaderName) noexcept
-{
-    return ShaderTypeAndNamesImpl::StringToShaderType(shaderName);
 }
 
 std::string RendererAPI::GetShaderInfoLog(GLuint shader) noexcept
@@ -83,7 +47,7 @@ std::string RendererAPI::GetShaderProgramInfoLog(GLuint shaderProgram) noexcept
     return GetInfoLog(shaderProgram, glGetShaderiv, glGetShaderInfoLog);
 }
 
-std::optional<std::string> RendererAPI::ValidateShaderCompilation(GLenum shader) noexcept
+std::optional<std::string> RendererAPI::GetShaderCompileError(GLenum shader) noexcept
 {
     assert(shader != 0);
     
@@ -98,7 +62,7 @@ std::optional<std::string> RendererAPI::ValidateShaderCompilation(GLenum shader)
     return std::nullopt;
 }
 
-std::optional<std::string> RendererAPI::ValidateShaderProgram(GLuint shaderProgram) noexcept
+std::optional<std::string> RendererAPI::GetShaderProgramError(GLuint shaderProgram) noexcept
 {
     assert(shaderProgram != 0);
     glValidateProgram(shaderProgram);
@@ -114,7 +78,7 @@ std::optional<std::string> RendererAPI::ValidateShaderProgram(GLuint shaderProgr
     return std::nullopt;
 }
 
-GLuint RendererAPI::CreateShaderFromSource(GLenum type, const char* source)
+GLuint RendererAPI::CreateShader(GLenum type, const char* source)
 {
     assert(source);
     assert(type == GL_VERTEX_SHADER || type == GL_FRAGMENT_SHADER);
@@ -124,18 +88,18 @@ GLuint RendererAPI::CreateShaderFromSource(GLenum type, const char* source)
     glShaderSource(shader, 1, &source, nullptr);
     glCompileShader(shader);
 
-    if (auto error = ValidateShaderCompilation(shader))
+    if (auto error = GetShaderCompileError(shader))
     {
         glDeleteShader(shader);
 
         auto shaderType = ShaderTypeToString(type);
-        throw std::runtime_error(shaderType.value_or("null") + std::string(" shader compilition failed\n") + error.value());
+        throw std::runtime_error(shaderType + std::string(" shader compilition failed\n") + error.value() + "\n\n" + source);
     }
 
     return shader;
 }
 
-GLuint RendererAPI::CreateShaderProgramFromShaders(GLuint vertexShader, GLuint fragmentShader)
+GLuint RendererAPI::CreateShaderProgram(GLuint vertexShader, GLuint fragmentShader)
 {
     assert(vertexShader != 0 && fragmentShader != 0);
 
@@ -156,7 +120,7 @@ void RendererAPI::LinkShaderProgram(GLuint shaderProgram)
 
     glLinkProgram(shaderProgram);
 
-    if (auto error = ValidateShaderProgram(shaderProgram))
+    if (auto error = GetShaderProgramError(shaderProgram))
     {
         throw std::runtime_error("Program failed to link\n" + error.value());
     }

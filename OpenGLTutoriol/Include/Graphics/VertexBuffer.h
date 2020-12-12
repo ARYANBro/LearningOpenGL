@@ -11,27 +11,15 @@ enum class LayoutDataType
     Float = 1, Float2 = 2, Float3 = 3
 };
 
-struct BufferLayout
+class BufferLayout
 {
 public:
     using ConstIterator = std::vector<LayoutDataType>::const_iterator;
     using Iterator = std::vector<LayoutDataType>::iterator;
 
 public:
-    BufferLayout() noexcept = default;
-    BufferLayout(std::initializer_list<LayoutDataType> initList) noexcept
-        : mElements()
-    {
-        GLint maxVertexAttribs;
-        glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &maxVertexAttribs);
-        
-        mElements.reserve(static_cast<std::size_t>(maxVertexAttribs));
-
-        for (const auto element : initList)
-        {
-            mElements.push_back(element);
-        }
-    }
+    BufferLayout() noexcept;
+    BufferLayout(std::initializer_list<LayoutDataType> initList) noexcept;
 
     ConstIterator begin() const noexcept { return mElements.begin(); }
     ConstIterator end() const noexcept { return mElements.end(); }

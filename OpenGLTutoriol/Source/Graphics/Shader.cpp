@@ -10,6 +10,21 @@
 #include <fstream>
 #include <memory>
 
+static GLenum StringToShaderType(const std::string& shaderName) noexcept
+{
+    if (shaderName == "vertex")
+    {
+        return GL_VERTEX_SHADER;
+    }
+    else if (shaderName == "fragment")
+    {
+        return GL_FRAGMENT_SHADER;
+    }
+
+    assert(false);
+    return 0;
+}
+
 static std::string RemoveWhiteSpace(const std::string& string) noexcept
 {
     std::string result;
@@ -37,7 +52,7 @@ static std::optional<GLenum> GetShaderTypeFromLine(const std::string& line)
         std::string shaderName = line.substr(searchPattern.size() + 1);
         shaderName = RemoveWhiteSpace(shaderName);
 
-        return RendererAPI::StringToShaderType(shaderName);
+        return StringToShaderType(shaderName);
     }
 
     return std::nullopt;
@@ -50,6 +65,7 @@ Shader::Shader(const std::string& vertexSource, const std::string& fragmentSourc
 }
 
 Shader::Shader(const std::string& filePath)
+    : mRendererID(0)
 {
     BuildFromFile(filePath);
 }
@@ -66,9 +82,9 @@ void Shader::BuildFromSource(const std::string& vertexSource, const std::string&
     GLuint vertexShader;
     GLuint fragmentShader;
 
-    vertexShader = RendererAPI::CreateShaderFromSource(GL_VERTEX_SHADER, vertexSource.c_str());
-    fragmentShader = RendererAPI::CreateShaderFromSource(GL_FRAGMENT_SHADER, fragmentSource.c_str());
-    mRendererID = RendererAPI::CreateShaderProgramFromShaders(vertexShader, fragmentShader);
+    vertexShader = RendererAPI::CreateShader(GL_VERTEX_SHADER, vertexSource.c_str());
+    fragmentShader = RendererAPI::CreateShader(GL_FRAGMENT_SHADER, fragmentSource.c_str());
+    mRendererID = RendererAPI::CreateShaderProgram(vertexShader, fragmentShader);
 
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
@@ -77,19 +93,13 @@ void Shader::BuildFromSource(const std::string& vertexSource, const std::string&
 void Shader::BuildFromFile(const std::string& filePath)
 {
     assert(!mRendererID);
-
-    if (!std::filesystem::exists(filePath))
-    {
-        throw std::runtime_error("File not found");
-    }
-
     const auto shaderSources = ParseFile(filePath);
 
     mRendererID = glCreateProgram();
 
     for (const auto& shaderSource : shaderSources)
     {
-        const GLuint shader = RendererAPI::CreateShaderFromSource(shaderSource.first, shaderSource.second.c_str());
+        const GLuint shader = RendererAPI::CreateShader(shaderSource.first, shaderSource.second.c_str());
         glAttachShader(mRendererID, shader);
     }
 
@@ -109,6 +119,11 @@ void Shader::Unbind() const noexcept
 void Shader::SetMat4(const std::string& name, const glm::mat4& matrix)
 {
     glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &matrix[0][0]);
+}
+
+void Shader::SetInt(const std::string& name, int value)
+{
+    glUniform1i(GetUniformLocation(name), value);
 }
 
 GLint Shader::GetUniformLocation(const std::string& name)
@@ -151,7 +166,11 @@ std::unordered_map<GLenum, std::string> Shader::ParseFile(const std::string& fil
     }
     catch (const std::ifstream::failure& failure)
     {
-        throw std::ifstream::failure("Could not read " + filePath);
+        throw std::ifstream::failure("Could not read " + filePath + "error code: ", failure.code());
+    }
+    catch (const std::exception& except)
+    {
+        throw std::runtime_error("Error in " + filePath + ' ' + except.what());
     }
 
     return shaderSources;

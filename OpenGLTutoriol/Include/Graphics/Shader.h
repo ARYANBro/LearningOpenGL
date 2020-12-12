@@ -10,7 +10,9 @@
 class Shader
 {
 public:
-    Shader() noexcept = default;
+    Shader() noexcept
+         : mRendererID(0)  {}
+         
     Shader(const std::string& vertexSource, const std::string& fragmentSource);
     Shader(const std::string& filePath);
     ~Shader() noexcept;
@@ -22,6 +24,7 @@ public:
     void Unbind() const noexcept;
     
     void SetMat4(const std::string& name, const glm::mat4& matrix);
+    void SetInt(const std::string& name, int value);
 
 private:
     unsigned int mRendererID;

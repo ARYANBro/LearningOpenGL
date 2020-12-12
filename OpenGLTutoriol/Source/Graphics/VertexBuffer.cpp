@@ -5,6 +5,24 @@
 #include <numeric>
 #include <cassert>
 
+BufferLayout::BufferLayout() noexcept
+    : mElements()
+{
+    GLint maxVertexAttribs;
+    glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &maxVertexAttribs);
+
+    mElements.reserve(static_cast<std::size_t>(maxVertexAttribs));
+}
+
+BufferLayout::BufferLayout(std::initializer_list<LayoutDataType> initList) noexcept
+    : BufferLayout()
+{
+    for (const auto element : initList)
+    {
+        mElements.push_back(element);
+    }
+}
+
 VertexBuffer::VertexBuffer(std::size_t size) noexcept
     : mRendererID(RendererAPI::CreateBuffer()),
       mVertexLayout()

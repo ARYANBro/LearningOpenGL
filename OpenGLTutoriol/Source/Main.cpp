@@ -4,7 +4,7 @@
 
 int main()
 {
-    std::unique_ptr<Application> application = std::make_unique<OpenGLApplication>();
+    OpenGLApplication app;
 
-    application->Run();
+    app.Run();
 }

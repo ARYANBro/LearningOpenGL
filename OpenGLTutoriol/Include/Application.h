@@ -7,14 +7,15 @@
 class Application
 {
 public:
-    Application(int windowWidth = 800, int windowHeight = 600, const std::string& windowName = "Application") noexcept;
+    Application() noexcept;
+    Application(int windowWidth, int windowHeight, const std::string& windowName) noexcept;
     virtual ~Application() noexcept = default;
 
     void Run() noexcept;
 
 protected:
     virtual void OnBegin() noexcept {}
-    virtual void OnUpdate() noexcept;
+    virtual void OnUpdate() noexcept {}
     virtual void OnRender() noexcept {}
     virtual void OnEnd() noexcept {}
 
@@ -23,4 +24,7 @@ protected:
 
 private:
     Window mWindow;
+
+private:
+    void InitRenderingContext() noexcept;
 };

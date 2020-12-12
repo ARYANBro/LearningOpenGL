@@ -1,9 +1,13 @@
 #include "Window.h"
 
+#include "GLFW/glfw3.h"
+
+#include <cassert>
+
 Window::Window(int width, int height, const std::string& name) noexcept
-    : mWindowHandle(nullptr)
 {
-    assert(glfwInit());
+    const int glfwInitResult = glfwInit();
+    assert(glfwInitResult);
 
     mWindowHandle = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr);
     assert(mWindowHandle);

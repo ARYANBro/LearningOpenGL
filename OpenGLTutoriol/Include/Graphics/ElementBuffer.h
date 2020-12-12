@@ -5,8 +5,8 @@
 class ElementBuffer
 {
 public:
-    ElementBuffer(unsigned int* indcies, unsigned int count) noexcept;
     ~ElementBuffer() noexcept;
+    ElementBuffer(unsigned int* indcies, unsigned int count) noexcept;
 
     void Bind() const noexcept;
     void Unbind() const noexcept;

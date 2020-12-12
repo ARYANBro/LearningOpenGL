@@ -25,7 +25,6 @@ static void CalculateOffsetAndStride(const BufferLayout& layout) noexcept
         glEnableVertexAttribArray(i);
 
         const GLint attribSize = static_cast<GLint>(layout[i]);
-        
         glVertexAttribPointer(i, attribSize, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<const void*>(attribOffset));
 
         attribOffset += static_cast<GLsizeiptr>(attribSize) * static_cast<GLsizeiptr>(sizeof(GLfloat));

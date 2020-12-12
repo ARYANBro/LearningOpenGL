@@ -18,8 +18,6 @@ static void CalculateOffsetAndStride(const BufferLayout& layout) noexcept
 
     stride *= static_cast<GLsizei>(sizeof(GLfloat));
 
-    std::cerr << "VertexArray::CalculateOffsetAndStride()::stride: " << stride << std::endl;
-
     GLsizeiptr attribOffset = 0;
 
     for (GLuint i = 0; i < layout.GetSize(); i++)
@@ -27,12 +25,9 @@ static void CalculateOffsetAndStride(const BufferLayout& layout) noexcept
         glEnableVertexAttribArray(i);
 
         const GLint attribSize = static_cast<GLint>(layout[i]);
-
-        std::cerr << "VertexArray::CalculateOffsetAndStride()::attribSize: " << attribSize << std::endl;
-
+        
         glVertexAttribPointer(i, attribSize, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<const void*>(attribOffset));
 
-        std::cerr << "VertexArray::CalculateOffsetAndStride()::attribOffset: " << attribOffset << std::endl;
         attribOffset += static_cast<GLsizeiptr>(attribSize) * static_cast<GLsizeiptr>(sizeof(GLfloat));
     }
 }

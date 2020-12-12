@@ -38,37 +38,9 @@ void OpenGLApplication::OnBegin() noexcept
     
     mVao.SetElementBuffer(elementBuffer);
 
-    constexpr const char* vertexShader = R"(
-        #version 460 core
-
-        layout (location = 0) in vec3 aPosition;
-        layout (location = 1) in vec3 aColor;
-
-        out vec4 vColor;
-
-        void main()
-        {
-            vColor = vec4(aColor, 1.0f);
-            gl_Position = vec4(aPosition, 1.0f);
-        }
-    )";
-
-    constexpr const char* fragmentShader = R"(
-        #version 460 core
-
-        out vec4 FragColor;
-
-        in vec4 vColor;
-
-        void main()
-        {
-            FragColor = vColor;
-        }
-    )";
-
     try
     {
-        mShader.BuildShaders(vertexShader, fragmentShader);
+        mShader.BuildFromFile("Assets/Shaders/Shader.glsl");
     }
     catch (const std::exception& except)
     {

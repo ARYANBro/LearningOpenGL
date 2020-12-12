@@ -11,16 +11,6 @@ ElementBuffer::ElementBuffer(unsigned int* indcies, unsigned int count) noexcept
 {
     assert(indcies);
 
-    int index;
-    for (auto iter = indcies; iter != indcies + count; iter++)
-    {
-        std::cerr << "ElementBuffer::ElementBuffer::indcies[" << index << "]: " << *iter << std::endl;
-        index++;
-    }
-
-    std::cerr << "ElementBuffer::mRendererID: " << mRendererID << std::endl;
-    std::cerr << "ElementBuffer::mCount: " << mCount<< std::endl;
-
     Bind();
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<GLsizeiptr>(count * sizeof(unsigned int)), indcies, GL_STATIC_DRAW);
 }
@@ -42,14 +32,6 @@ void ElementBuffer::Unbind() const noexcept
 
 void ElementBuffer::SetData(unsigned int* indcies, unsigned int count) noexcept
 {
-    int index;
-    for (auto iter = indcies; iter != indcies + count; iter++)
-    {
-        std::cerr << "ElementBuffer::ElementBuffer::indcies[" << index << "]: " << *iter << std::endl;
-        index++;
-    }
-    std::cerr << "ElementBuffer::SetData()::count: " << count << std::endl;
-
     assert(indcies);
 
     Bind();

@@ -4,15 +4,54 @@
 
 #include "glad/glad.h"
 
-#include <iostream>
-#include <unordered_map>
-#include <memory>
+#include <filesystem>
 #include <stdexcept>
+#include <iostream>
+#include <fstream>
+#include <memory>
+
+static std::string RemoveWhiteSpace(const std::string& string) noexcept
+{
+    std::string result;
+    result.reserve(string.size());
+
+    for (const char ch : string)
+    {
+        if (std::isspace(ch))
+        {
+            continue;
+        }
+
+        result.push_back(ch);
+    }
+
+    return result;
+}
+
+static std::optional<GLenum> GetShaderTypeFromLine(const std::string& line)
+{
+    const std::string_view searchPattern = "#shader";
+
+    if (line.find(searchPattern) != std::string::npos)
+    {
+        std::string shaderName = line.substr(searchPattern.size() + 1);
+        shaderName = RemoveWhiteSpace(shaderName);
+
+        return RendererAPI::StringToShaderType(shaderName);
+    }
+
+    return std::nullopt;
+}
 
 Shader::Shader(const std::string& vertexSource, const std::string& fragmentSource)
     : mRendererID(0)
 {
-    BuildShaders(vertexSource, fragmentSource);
+    BuildFromSource(vertexSource, fragmentSource);
+}
+
+Shader::Shader(const std::string& filePath)
+{
+    BuildFromFile(filePath);
 }
 
 Shader::~Shader() noexcept
@@ -20,31 +59,41 @@ Shader::~Shader() noexcept
     glDeleteProgram(mRendererID);
 }
 
-void Shader::BuildShaders(const std::string& vertexSource, const std::string& fragmentSource)
+void Shader::BuildFromSource(const std::string& vertexSource, const std::string& fragmentSource)
 {
+    assert(!mRendererID);
+
     GLuint vertexShader;
     GLuint fragmentShader;
 
-    try
+    vertexShader = RendererAPI::CreateShaderFromSource(GL_VERTEX_SHADER, vertexSource.c_str());
+    fragmentShader = RendererAPI::CreateShaderFromSource(GL_FRAGMENT_SHADER, fragmentSource.c_str());
+    mRendererID = RendererAPI::CreateShaderProgramFromShaders(vertexShader, fragmentShader);
+
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+}
+
+void Shader::BuildFromFile(const std::string& filePath)
+{
+    assert(!mRendererID);
+
+    if (!std::filesystem::exists(filePath))
     {
-        vertexShader = RendererAPI::CreateShaderFromSource(GL_VERTEX_SHADER, vertexSource.c_str());
-        fragmentShader = RendererAPI::CreateShaderFromSource(GL_FRAGMENT_SHADER, fragmentSource.c_str());
-        mRendererID = RendererAPI::CreateShaderProgramFromShaders(vertexShader, fragmentShader);
-
-        std::cerr << "Shader::BuildShaders()::vertexShader: " << vertexShader << std::endl;
-        std::cerr << "Shader::BuildShaders()::fragmentShadr: " << fragmentShader << std::endl;
-        std::cerr << "Shader::mRendererID: " << mRendererID << std::endl;
-
-        glDeleteShader(vertexShader);
-        glDeleteShader(fragmentShader);
+        throw std::runtime_error("File not found");
     }
-    catch (const std::exception&)
+
+    const auto shaderSources = ParseFile(filePath);
+
+    mRendererID = glCreateProgram();
+
+    for (const auto& shaderSource : shaderSources)
     {
-        glDeleteShader(vertexShader);
-        glDeleteShader(fragmentShader);
-
-        throw;
+        const GLuint shader = RendererAPI::CreateShaderFromSource(shaderSource.first, shaderSource.second.c_str());
+        glAttachShader(mRendererID, shader);
     }
+
+    RendererAPI::LinkShaderProgram(mRendererID);
 }
 
 void Shader::Bind() const noexcept
@@ -72,4 +121,38 @@ GLint Shader::GetUniformLocation(const std::string& name)
     }
 
     return location;
+}
+
+std::unordered_map<GLenum, std::string> Shader::ParseFile(const std::string& filePath)
+{
+    std::ifstream inFileStream;
+    inFileStream.exceptions(std::ios::badbit);
+
+    std::unordered_map<GLenum, std::string> shaderSources;
+
+    try
+    {
+        inFileStream.open(filePath);
+
+        std::string line;
+        GLenum currentShaderType = 0;
+
+        while (std::getline(inFileStream, line))
+        {
+            if (const auto newShaderType = GetShaderTypeFromLine(line))
+            {
+                currentShaderType = newShaderType.value();
+            }
+            else if (currentShaderType != 0)
+            {
+                shaderSources[currentShaderType] += line += '\n';
+            }
+        }
+    }
+    catch (const std::ifstream::failure& failure)
+    {
+        throw std::ifstream::failure("Could not read " + filePath);
+    }
+
+    return shaderSources;
 }

@@ -12,10 +12,9 @@ static void InitRenderingContext(Window& window) noexcept
     glfwWindowHint(GLFW_VERSION_MINOR, 6);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
-    {
-        assert(false);
-    }
+    const int gladInitResult = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
+
+    assert(gladInitResult);
 
     std::cout << "OpenGL version: " << glGetString(GL_VERSION) << std::endl;
 

@@ -14,6 +14,10 @@ enum class LayoutDataType
 struct BufferLayout
 {
 public:
+    using ConstIterator = std::vector<LayoutDataType>::const_iterator;
+    using Iterator = std::vector<LayoutDataType>::iterator;
+
+public:
     BufferLayout() noexcept = default;
     BufferLayout(std::initializer_list<LayoutDataType> initList) noexcept
         : mElements()
@@ -28,6 +32,11 @@ public:
             mElements.push_back(element);
         }
     }
+
+    ConstIterator begin() const noexcept { return mElements.begin(); }
+    ConstIterator end() const noexcept { return mElements.end(); }
+    Iterator begin() noexcept { return mElements.begin(); }
+    Iterator end() noexcept { return mElements.end(); }
     
     LayoutDataType& operator[](std::size_t index) noexcept
     {

@@ -6,27 +6,6 @@
 #include <iostream>
 #include <cassert>
 
-static void OpengLDebugMessageCallback(GLenum, GLenum, GLuint, GLenum severity, GLsizei, const GLchar* message, const void*)
-{
-    switch (severity)
-    {
-    case GL_DEBUG_SEVERITY_HIGH:
-        std::cerr << "OpenGL Severity High: " << message << std::endl;
-        break;
-
-    case GL_DEBUG_SEVERITY_MEDIUM:
-        std::cerr << "OpenGL Severity Medium: " << message << std::endl;
-        break;
-
-    case GL_DEBUG_SEVERITY_LOW:
-        std::cerr << "OpenGL Severity Low: " << message << std::endl;
-        break;
-
-    case GL_DEBUG_SEVERITY_NOTIFICATION:
-    default: break;
-    }
-}
-
 Application::Application() noexcept
     : mWindow() 
 {
@@ -65,7 +44,29 @@ void Application::InitRenderingContext() noexcept
     const int gladInitResult = gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress));
     assert(gladInitResult);
 
-    glDebugMessageCallback(OpengLDebugMessageCallback, nullptr);
+    auto debugMessageCallback = [](GLenum, GLenum, GLuint, GLenum severity, GLsizei, const GLchar* message, const void*)
+    {
+        switch (severity)
+        {
+        case GL_DEBUG_SEVERITY_HIGH:
+            std::cerr << "OpenGL Severity High: " << message << std::endl;
+            break;
+
+        case GL_DEBUG_SEVERITY_MEDIUM:
+            std::cerr << "OpenGL Severity Medium: " << message << std::endl;
+            break;
+
+        case GL_DEBUG_SEVERITY_LOW:
+            std::cerr << "OpenGL Severity Low: " << message << std::endl;
+            break;
+
+        case GL_DEBUG_SEVERITY_NOTIFICATION:
+        default:
+            break;
+        }
+    };
+
+    glDebugMessageCallback(debugMessageCallback, nullptr);
     glEnable(GL_DEBUG_OUTPUT);
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 

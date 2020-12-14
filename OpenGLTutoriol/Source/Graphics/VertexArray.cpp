@@ -32,7 +32,9 @@ static void CalculateOffsetAndStride(const BufferLayout& layout) noexcept
 }
 
 VertexArray::VertexArray() noexcept
-    : mRendererID(RendererAPI::CreateVertexArray())
+    : mRendererID(RendererAPI::CreateVertexArray()),
+    mVertexBuffers(),
+    mElementBuffer(nullptr)
 {
 }
 
@@ -41,7 +43,7 @@ VertexArray::~VertexArray() noexcept
     glDeleteVertexArrays(1, &mRendererID);
 }
 
-void VertexArray::AddVertexBuffer(std::shared_ptr<VertexBuffer> vertexBuffer) noexcept
+void VertexArray::AddVertexBuffer(const std::shared_ptr<VertexBuffer>& vertexBuffer) noexcept
 {
     Bind();
     vertexBuffer->Bind();
@@ -51,7 +53,7 @@ void VertexArray::AddVertexBuffer(std::shared_ptr<VertexBuffer> vertexBuffer) no
     mVertexBuffers.push_back(vertexBuffer);
 }
 
-void VertexArray::SetElementBuffer(std::shared_ptr<ElementBuffer> elementBuffer) noexcept
+void VertexArray::SetElementBuffer(const std::shared_ptr<ElementBuffer>& elementBuffer) noexcept
 {
     Bind();
     elementBuffer->Bind();

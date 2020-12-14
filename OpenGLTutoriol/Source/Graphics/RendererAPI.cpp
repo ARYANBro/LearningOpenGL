@@ -88,7 +88,7 @@ GLuint RendererAPI::CreateShader(GLenum type, const char* source)
     glShaderSource(shader, 1, &source, nullptr);
     glCompileShader(shader);
 
-    if (auto error = GetShaderCompileError(shader))
+    if (const auto error = GetShaderCompileError(shader))
     {
         glDeleteShader(shader);
 

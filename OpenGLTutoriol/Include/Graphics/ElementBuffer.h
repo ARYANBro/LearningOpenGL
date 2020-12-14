@@ -6,12 +6,12 @@ class ElementBuffer
 {
 public:
     ~ElementBuffer() noexcept;
-    ElementBuffer(unsigned int* indcies, unsigned int count) noexcept;
+    ElementBuffer(const unsigned int* indcies, unsigned int count) noexcept;
 
     void Bind() const noexcept;
     void Unbind() const noexcept;
-
-    void SetData(unsigned int* indcies, unsigned int count) noexcept;
+    
+    void SetData(const unsigned int* indcies, unsigned int count) noexcept;
 
     constexpr unsigned int GetCount() const noexcept { return mCount; }
 

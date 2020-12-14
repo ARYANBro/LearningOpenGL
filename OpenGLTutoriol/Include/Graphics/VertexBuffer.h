@@ -47,7 +47,7 @@ class VertexBuffer
 {
 public:
     VertexBuffer(std::size_t size) noexcept;
-    VertexBuffer(const void* data, std::size_t size) noexcept;
+    explicit VertexBuffer(const void* data, std::size_t size) noexcept;
     ~VertexBuffer() noexcept;
 
     void Bind() const noexcept;
@@ -61,4 +61,7 @@ public:
 private:
     unsigned int mRendererID;
     BufferLayout mVertexLayout;
+
+private:
+    void AllocateBufferData(const void* data, std::size_t size) noexcept;
 };

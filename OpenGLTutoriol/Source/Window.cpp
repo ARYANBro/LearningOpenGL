@@ -5,11 +5,14 @@
 #include <cassert>
 
 Window::Window(int width, int height, const std::string& name) noexcept
+    : mWindowHandle(nullptr),
+    mWidth(width), mHeight(height),
+    mName(name)
 {
     const int glfwInitResult = glfwInit();
     assert(glfwInitResult);
 
-    mWindowHandle = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr);
+    mWindowHandle = glfwCreateWindow(mWidth, mHeight, mName.c_str(), nullptr, nullptr);
     assert(mWindowHandle);
 }
 

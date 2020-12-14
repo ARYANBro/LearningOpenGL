@@ -11,54 +11,53 @@
 
 void OpenGLApplication::OnBegin() noexcept
 {
-    InitBuffers();
-    LoadAssets();
+    const float vertcies[] = {
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 
-    mPavingStonesTexture.Bind(0);
-    mFabricTexture.Bind(1);
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
 
-    mVao.Bind();
-    mShader.Bind();
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 
-    mShader.SetInt("uPavingStonesTexture", 0);
-    mShader.SetInt("uFabricTexture", 1);
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-}
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
 
-void OpenGLApplication::OnUpdate() noexcept
-{
-    if (glfwGetKey(GetWindow().GetHandle(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
-    {
-        glfwSetWindowShouldClose(GetWindow().GetHandle(), true);
-    }
-}
-
-void OpenGLApplication::OnRender() noexcept
-{
-    glClearColor(0.02f, 0.05f, 0.05f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(mVao.GetElementBuffer()->GetCount()), GL_UNSIGNED_INT, nullptr);
-
-    glfwSwapBuffers(GetWindow().GetHandle());
-    GetWindow().PollEvents();
-}
-
-void OpenGLApplication::InitBuffers() noexcept
-{
-    const float vertcies[8 * 4] = {
-        -0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  0.0f, 0.0f,
-        -0.5f,  0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 1.0f,
-         0.5f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  1.0f, 1.0f,
-         0.5f, -0.5f, 0.0f,  1.0f, 1.0f, 1.0f,  1.0f, 0.0f
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
 
     const auto vertexBuffer = std::make_shared<VertexBuffer>(vertcies, sizeof(vertcies));
 
     const BufferLayout layout = {
-        LayoutDataType::Float3,
         LayoutDataType::Float3,
         LayoutDataType::Float2
     };
@@ -67,20 +66,90 @@ void OpenGLApplication::InitBuffers() noexcept
 
     mVao.AddVertexBuffer(vertexBuffer);
 
-    unsigned int indcies[3 * 2] = { 
-        0, 1, 2,
-        0, 2, 3
+    LoadAssets();
+
+    mPavingStonesTexture.Bind(0);
+
+    mFabricTexture.Bind(1);
+
+    mVao.Bind();
+    mShader.Bind();
+
+    mShader.SetInt("uPavingStonesTexture", 0);
+    mShader.SetInt("uFabricTexture", 1);
+
+    mModelMatrix = glm::mat4(1.0f);
+
+    mViewMatrix = glm::mat4(1.0f);
+    mViewMatrix = glm::translate(mViewMatrix, glm::vec3(0.0f, 0.0f, -3.0f));
+    
+    mProjectionMatrix = glm::perspective(glm::radians(45.0f), static_cast<float>(GetWindow().GetHeight()) / GetWindow().GetWidth(), 0.1f, 100.0f);
+
+    mShader.SetMat4("uProjectionMatrix", mProjectionMatrix);
+    mShader.SetMat4("uViewMatrix", mViewMatrix);
+
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+}
+
+void OpenGLApplication::OnUpdate() noexcept
+{
+    auto getKey = [this](int glfwKey)
+    {
+        return glfwGetKey(GetWindow().GetHandle(), glfwKey) == GLFW_PRESS;
     };
 
-    const auto elementBuffer = std::make_shared<ElementBuffer>(indcies, std::size(indcies));
-    
-    mVao.SetElementBuffer(elementBuffer);
+    auto rotate = [&](const glm::vec3& axis, float rotationDegrees = 5.0f)
+    {
+        mModelMatrix = glm::rotate(mModelMatrix, glm::radians(rotationDegrees), axis);
+    };
+
+    if (getKey(GLFW_KEY_ESCAPE))
+    {
+        glfwSetWindowShouldClose(GetWindow().GetHandle(), true);
+    }
+
+    if (getKey(GLFW_KEY_A))
+    {
+        rotate(glm::vec3(0.0f, -1.0f, 0.0f));
+    }
+    else if (getKey(GLFW_KEY_D))
+    {
+        rotate(glm::vec3(0.0f, 1.0f, 0.0f));
+    }
+
+    if (getKey(GLFW_KEY_W))
+    {
+        rotate(glm::vec3(-1.0f, 0.0f, 0.0f));
+    }
+    else if (getKey(GLFW_KEY_S))
+    {
+        rotate(glm::vec3(1.0f, 0.0f, 0.0f));
+    }
+
+    if (getKey(GLFW_KEY_SPACE))
+    {
+        mModelMatrix = glm::mat4(1.0f);
+    }
+
+    mShader.SetMat4("uModelMatrix", mModelMatrix);
+}
+
+void OpenGLApplication::OnRender() noexcept
+{
+    glClearColor(0.02f, 0.05f, 0.05f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glDrawArrays(GL_TRIANGLES, 0, 36);
+
+    glfwSwapBuffers(GetWindow().GetHandle());
+    GetWindow().PollEvents();
 }
 
 void OpenGLApplication::LoadAssets() noexcept
 {
     mShader.BuildFromFile("Assets/Shaders/Shader.glsl");
-    
     mPavingStonesTexture.Load("Assets/Textures/PavingStone/PavingStones085_2K_Color.jpg");
-    mFabricTexture.Load("Assets/Textures/FabricPattern/fabric_pattern_07_col_03_1k.png");    
+    mFabricTexture.Load("Assets/Textures/FabricPattern/fabric_pattern_07_col_1_1k.png");    
 }

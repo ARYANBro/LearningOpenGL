@@ -14,8 +14,7 @@ add_compile_definitions(
 if (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     add_compile_options(
         -Wsign-conversion
-        -pedantic
-        -Wfatal-errors
+        -pedantic-errors
         -Wextra
         -Wall
     )

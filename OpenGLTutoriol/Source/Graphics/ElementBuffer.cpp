@@ -5,9 +5,9 @@
 #include <iostream>
 #include <cassert>
 
-ElementBuffer::ElementBuffer(unsigned int* indcies, unsigned int count) noexcept
+ElementBuffer::ElementBuffer(const unsigned int* indcies, unsigned int count) noexcept
     : mRendererID(RendererAPI::CreateBuffer()),
-      mCount(count)
+    mCount(count)
 {
     assert(indcies);
 
@@ -30,7 +30,7 @@ void ElementBuffer::Unbind() const noexcept
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void ElementBuffer::SetData(unsigned int* indcies, unsigned int count) noexcept
+void ElementBuffer::SetData(const unsigned int* indcies, unsigned int count) noexcept
 {
     assert(indcies);
 

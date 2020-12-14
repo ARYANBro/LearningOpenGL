@@ -5,14 +5,15 @@
 
 #include <memory>
 
+
 class VertexArray
 {
 public:
     VertexArray() noexcept;
     ~VertexArray() noexcept;
 
-    void AddVertexBuffer(std::shared_ptr<VertexBuffer> vertexBuff) noexcept;
-    void SetElementBuffer(std::shared_ptr<ElementBuffer> elementBuff) noexcept;
+    void AddVertexBuffer(const std::shared_ptr<VertexBuffer>& vertexBuffer) noexcept;
+    void SetElementBuffer(const std::shared_ptr<ElementBuffer>& elementBuffer) noexcept;
 
     void Bind() const noexcept;
     void Unbind() const noexcept;

@@ -4,7 +4,7 @@
 
 int main()
 {
-    OpenGLApplication app;
+    OpenGLApplication application(800, 800);
 
-    app.Run();
+    application.Run();
 }

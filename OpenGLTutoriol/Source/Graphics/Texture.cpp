@@ -29,7 +29,7 @@ void Texture::TextureData::Load(const std::string& filePath) noexcept
 
 Texture::Texture() noexcept
     : mRendererID(0),
-      mTextureData()
+    mTextureData{ nullptr, 0, 0, 0, 0, 0 }
   
 {
     glCreateTextures(GL_TEXTURE_2D, 1, &mRendererID);

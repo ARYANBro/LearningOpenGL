@@ -2,18 +2,20 @@
 #version 460 core
 
 layout (location = 0) in vec3 aPosition;
-layout (location = 1) in vec3 aColor;
-layout (location = 2) in vec2 aTexCoords;
+layout (location = 1) in vec2 aTexCoords;
 
 out vec4 vColor;
 out vec2 vTexCoords;
 
+uniform mat4 uModelMatrix;
+uniform mat4 uViewMatrix;
+uniform mat4 uProjectionMatrix;
+
 void main()
 {
-    vColor = vec4(aColor, 1.0f);
     vTexCoords = aTexCoords;
 
-    gl_Position = vec4(aPosition, 1.0f);
+    gl_Position = uProjectionMatrix * uViewMatrix * uModelMatrix * vec4(aPosition, 1.0f);
 }
 
 #shader fragment
@@ -29,5 +31,5 @@ uniform sampler2D uFabricTexture;
 
 void main()
 {
-    FragColor = mix(texture(uPavingStonesTexture, vTexCoords), texture(uFabricTexture, vTexCoords), 0.2f);
+    FragColor = mix(texture(uPavingStonesTexture, vTexCoords), texture(uFabricTexture, vTexCoords), 0.1f);
 }

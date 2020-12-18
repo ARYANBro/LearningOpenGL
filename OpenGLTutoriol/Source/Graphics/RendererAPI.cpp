@@ -21,7 +21,7 @@ static std::string ShaderTypeToString(GLenum shaderType) noexcept
     }
 }
 
-static std::string GetInfoLog(GLuint object, void (*getivFunction)(GLuint, GLenum, GLint*), void (*getInfoLogFunciotion)(GLuint, GLsizei, GLsizei*, GLchar*)) noexcept
+static std::string GetInfoLog(GLuint object, void (*getivFunction)(GLuint, GLenum, GLint*), void (*getInfoLogFunction)(GLuint, GLsizei, GLsizei*, GLchar*))
 {
     assert(object != 0);
     GLint logLength;
@@ -30,7 +30,7 @@ static std::string GetInfoLog(GLuint object, void (*getivFunction)(GLuint, GLenu
     const auto logInfo = std::make_unique<GLchar[]>(static_cast<size_t>(logLength));
     GLchar* logInfoData = logInfo.get();
         
-    getInfoLogFunciotion(object, logLength, nullptr, logInfoData);
+    getInfoLogFunction(object, logLength, nullptr, logInfoData);
 
     return logInfoData;
 }
@@ -38,13 +38,29 @@ static std::string GetInfoLog(GLuint object, void (*getivFunction)(GLuint, GLenu
 std::string RendererAPI::GetShaderInfoLog(GLuint shader) noexcept
 {
     assert(shader != 0);
-    return GetInfoLog(shader, glGetShaderiv, glGetShaderInfoLog);
+
+    try
+    {
+       return GetInfoLog(shader, glGetShaderiv, glGetShaderInfoLog);
+    }
+    catch (const std::exception& except)
+    {
+        return "null";
+    }
 }
 
 std::string RendererAPI::GetShaderProgramInfoLog(GLuint shaderProgram) noexcept
 {
     assert(shaderProgram != 0);
-    return GetInfoLog(shaderProgram, glGetShaderiv, glGetShaderInfoLog);
+
+    try
+    {
+        return GetInfoLog(shaderProgram, glGetShaderiv, glGetShaderInfoLog);
+    }
+    catch (const std::exception& except)
+    {
+        return "null";
+    }
 }
 
 std::optional<std::string> RendererAPI::GetShaderCompileError(GLenum shader) noexcept

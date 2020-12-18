@@ -28,11 +28,10 @@ void Texture::TextureData::Load(const std::string& filePath) noexcept
 }
 
 Texture::Texture() noexcept
-    : mRendererID(0),
-    mTextureData{ nullptr, 0, 0, 0, 0, 0 }
+    : m_RendererID(0), m_TextureData()
   
 {
-    glCreateTextures(GL_TEXTURE_2D, 1, &mRendererID);
+    glCreateTextures(GL_TEXTURE_2D, 1, &m_RendererID);
 }
 
 Texture::Texture(const std::string& filePath)
@@ -44,13 +43,13 @@ Texture::Texture(const std::string& filePath)
 
 Texture::~Texture() noexcept
 {
-    glDeleteTextures(1, &mRendererID);
-    stbi_image_free(mTextureData.Data);
+    glDeleteTextures(1, &m_RendererID);
+    stbi_image_free(m_TextureData.Data);
 }
 
 void Texture::Bind(unsigned int slot) noexcept
 {
-    glBindTextureUnit(slot, mRendererID);
+    glBindTextureUnit(slot, m_RendererID);
 }
 
 void Texture::Unbind() noexcept
@@ -60,9 +59,9 @@ void Texture::Unbind() noexcept
 
 void Texture::Load(const std::string& filePath)
 {
-    assert(!mTextureData.Data);
+    assert(!m_TextureData.Data);
 
-    mTextureData.Load(filePath);
+    m_TextureData.Load(filePath);
 
     Bind();
 
@@ -72,10 +71,10 @@ void Texture::Load(const std::string& filePath)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-    SetData(mTextureData);
+    UploadData(m_TextureData);
 }
 
-void Texture::SetData(TextureData textureData) noexcept
+void Texture::UploadData(TextureData textureData) noexcept
 {
     glTexImage2D(
         GL_TEXTURE_2D,

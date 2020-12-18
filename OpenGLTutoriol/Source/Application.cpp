@@ -3,37 +3,45 @@
 #include "GLFW/glfw3.h"
 #include "glad/glad.h"
 
+#include <chrono>
 #include <iostream>
 #include <cassert>
 
+Application* Application::s_Application = nullptr;
+
 Application::Application() noexcept
-    : mWindow() 
+    : m_Window() 
 {
-    InitRenderingContext();
+    Init();
 }
 
 Application::Application(int windowWidth, int windowHeight, const std::string& windowName) noexcept
-    : mWindow(windowWidth, windowHeight, windowName)
+    : m_Window(windowWidth, windowHeight, windowName)
 {
-    InitRenderingContext();
+    Init();
 }
 
 void Application::Run() noexcept
 {
     OnBegin();
 
-    while (!mWindow.IsClosed())
+    DeltaTime delta;
+    
+    while (!m_Window.IsClosed())
     {
-        OnUpdate();
+        delta.Calculate();
+
+        OnUpdate(delta);
         OnRender();
     }
 
     OnEnd();
 }
 
-void Application::InitRenderingContext() noexcept
+void Application::Init() noexcept
 {
-    GLFWwindow* windowHandle = mWindow.GetHandle();
+    s_Application = this;
+    GLFWwindow* windowHandle = m_Window.GetHandle();
 
     glfwMakeContextCurrent(windowHandle);
 
@@ -73,5 +81,15 @@ void Application::InitRenderingContext() noexcept
     glfwSetFramebufferSizeCallback(windowHandle, [](GLFWwindow*, int width, int height)
     {
         glViewport(0, 0, width, height);
+    });
+
+    m_Window.SetMouseMovedCallback([this](double xPos, double yPos)
+    {
+        OnMouseMoved(xPos, yPos);
+    });
+
+    m_Window.SetMouseScrolledCallback([this](double xOffset, double yOffset)
+    {
+        OnMouseScrolled(xOffset, yOffset);
     });
 }

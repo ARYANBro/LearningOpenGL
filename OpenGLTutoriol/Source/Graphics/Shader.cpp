@@ -3,6 +3,7 @@
 #include "Graphics/RendererAPI.h"
 
 #include "glad/glad.h"
+#include "glm/gtc/type_ptr.hpp"
 
 #include <filesystem>
 #include <stdexcept>
@@ -25,7 +26,7 @@ static GLenum StringToShaderType(const std::string& shaderName) noexcept
     return 0;
 }
 
-static std::string RemoveWhiteSpace(const std::string& string) noexcept
+static std::string RemoveWhiteSpace(const std::string& string)
 {
     std::string result;
     result.reserve(string.size());
@@ -59,32 +60,32 @@ static std::optional<GLenum> GetShaderTypeFromLine(const std::string& line)
 }
 
 Shader::Shader(const std::string& vertexSource, const std::string& fragmentSource)
-    : mRendererID(0)
+    : m_RendererID(0)
 {
     BuildFromSource(vertexSource, fragmentSource);
 }
 
 Shader::Shader(const std::string& filePath)
-    : mRendererID(0)
+    : m_RendererID(0)
 {
     BuildFromFile(filePath);
 }
 
 Shader::~Shader() noexcept
 {
-    glDeleteProgram(mRendererID);
+    glDeleteProgram(m_RendererID);
 }
 
 void Shader::BuildFromSource(const std::string& vertexSource, const std::string& fragmentSource)
 {
-    assert(!mRendererID);
+    assert(!m_RendererID);
 
     GLuint vertexShader;
     GLuint fragmentShader;
 
     vertexShader = RendererAPI::CreateShader(GL_VERTEX_SHADER, vertexSource.c_str());
     fragmentShader = RendererAPI::CreateShader(GL_FRAGMENT_SHADER, fragmentSource.c_str());
-    mRendererID = RendererAPI::CreateShaderProgram(vertexShader, fragmentShader);
+    m_RendererID = RendererAPI::CreateShaderProgram(vertexShader, fragmentShader);
 
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
@@ -92,23 +93,23 @@ void Shader::BuildFromSource(const std::string& vertexSource, const std::string&
 
 void Shader::BuildFromFile(const std::string& filePath)
 {
-    assert(!mRendererID);
+    assert(!m_RendererID);
     const auto shaderSources = ParseFile(filePath);
 
-    mRendererID = glCreateProgram();
+    m_RendererID = glCreateProgram();
 
     for (const auto& shaderSource : shaderSources)
     {
         const GLuint shader = RendererAPI::CreateShader(shaderSource.first, shaderSource.second.c_str());
-        glAttachShader(mRendererID, shader);
+        glAttachShader(m_RendererID, shader);
     }
 
-    RendererAPI::LinkShaderProgram(mRendererID);
+    RendererAPI::LinkShaderProgram(m_RendererID);
 }
 
 void Shader::Bind() const noexcept
 {
-    glUseProgram(mRendererID);
+    glUseProgram(m_RendererID);
 }
 
 void Shader::Unbind() const noexcept
@@ -118,7 +119,7 @@ void Shader::Unbind() const noexcept
 
 void Shader::SetMat4(const std::string& name, const glm::mat4& matrix)
 {
-    glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, &matrix[0][0]);
+    glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
 void Shader::SetInt(const std::string& name, int value)
@@ -128,7 +129,7 @@ void Shader::SetInt(const std::string& name, int value)
 
 GLint Shader::GetUniformLocation(const std::string& name)
 {
-    GLint location = glGetUniformLocation(mRendererID, name.c_str());
+    GLint location = glGetUniformLocation(m_RendererID, name.c_str());
 
     if (location == -1)
     {

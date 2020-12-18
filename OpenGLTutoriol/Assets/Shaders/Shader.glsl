@@ -1,35 +1,35 @@
 #shader vertex
 #version 460 core
 
-layout (location = 0) in vec3 aPosition;
-layout (location = 1) in vec2 aTexCoords;
+layout (location = 0) in vec3 a_Position;
+layout (location = 1) in vec2 a_TexCoords;
 
-out vec4 vColor;
-out vec2 vTexCoords;
+out vec4 v_Color;
+out vec2 v_TexCoords;
 
-uniform mat4 uModelMatrix;
-uniform mat4 uViewMatrix;
-uniform mat4 uProjectionMatrix;
+uniform mat4 u_ModelMatrix;
+uniform mat4 u_ViewMatrix;
+uniform mat4 u_ProjectionMatrix;
 
 void main()
 {
-    vTexCoords = aTexCoords;
+    v_TexCoords = a_TexCoords;
 
-    gl_Position = uProjectionMatrix * uViewMatrix * uModelMatrix * vec4(aPosition, 1.0f);
-}
+    gl_Position = u_ProjectionMatrix * u_ViewMatrix * u_ModelMatrix * vec4(a_Position, 1.0f);
+ }
 
 #shader fragment
 #version 460 core
 
-out vec4 FragColor;
+out vec4 fragColor;
 
-in vec4 vColor;
-in vec2 vTexCoords;
+in vec4 v_Color;
+in vec2 v_TexCoords;
 
-uniform sampler2D uPavingStonesTexture;
-uniform sampler2D uFabricTexture;
+uniform sampler2D u_PavingStonesTexture;
+uniform sampler2D u_FabricTexture;
 
 void main()
 {
-    FragColor = mix(texture(uPavingStonesTexture, vTexCoords), texture(uFabricTexture, vTexCoords), 0.1f);
+    fragColor = mix(texture(u_PavingStonesTexture, v_TexCoords), texture(u_FabricTexture, v_TexCoords), 0.1f);
 }

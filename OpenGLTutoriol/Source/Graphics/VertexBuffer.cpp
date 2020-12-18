@@ -5,46 +5,44 @@
 #include <numeric>
 #include <cassert>
 
-BufferLayout::BufferLayout() noexcept
-    : mElements()
+BufferLayout::BufferLayout()
+    : m_Elements()
 {
     GLint maxVertexAttribs;
     glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &maxVertexAttribs);
 
-    mElements.reserve(static_cast<std::size_t>(maxVertexAttribs));
+    m_Elements.reserve(static_cast<std::size_t>(maxVertexAttribs));
 }
 
-BufferLayout::BufferLayout(std::initializer_list<LayoutDataType> initList) noexcept
+BufferLayout::BufferLayout(std::initializer_list<LayoutDataType> initList)
     : BufferLayout()
 {
     for (const auto element : initList)
     {
-        mElements.push_back(element);
+        m_Elements.push_back(element);
     }
 }
 
 VertexBuffer::VertexBuffer(std::size_t size) noexcept
-    : mRendererID(RendererAPI::CreateBuffer()),
-    mVertexLayout()
+    : m_RendererID(RendererAPI::CreateBuffer()), m_VertexLayout()
 {
     AllocateBufferData(nullptr, size);
 }
 
 VertexBuffer::VertexBuffer(const void* data, std::size_t size) noexcept
-    : mRendererID(RendererAPI::CreateBuffer()),
-    mVertexLayout()
+    : m_RendererID(RendererAPI::CreateBuffer()), m_VertexLayout()
 {
     AllocateBufferData(data, size);
 }
 
 VertexBuffer::~VertexBuffer() noexcept
 {
-    glDeleteBuffers(1, &mRendererID);
+    glDeleteBuffers(1, &m_RendererID);
 }
 
 void VertexBuffer::Bind() const noexcept
 {
-    glBindBuffer(GL_ARRAY_BUFFER, mRendererID);
+    glBindBuffer(GL_ARRAY_BUFFER, m_RendererID);
 }
 
 void VertexBuffer::Unbind() const noexcept
@@ -52,11 +50,10 @@ void VertexBuffer::Unbind() const noexcept
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void VertexBuffer::SetData(const void* data, std::size_t size) noexcept
+void VertexBuffer::SetBufferData(const void* data, std::size_t size) noexcept
 {
     Bind();
-    glBufferSubData(GL_ARRAY_BUFFER, 0, static_cast<GLsizeiptr>(size), data);
-    
+    glBufferSubData(GL_ARRAY_BUFFER, 0, static_cast<GLsizeiptr>(size), data);  
 }
 
 void VertexBuffer::AllocateBufferData(const void* data, std::size_t size) noexcept

@@ -6,8 +6,7 @@
 #include <cassert>
 
 ElementBuffer::ElementBuffer(const unsigned int* indcies, unsigned int count) noexcept
-    : mRendererID(RendererAPI::CreateBuffer()),
-    mCount(count)
+    : m_RendererID(RendererAPI::CreateBuffer()), m_Count(count)
 {
     assert(indcies);
 
@@ -17,12 +16,12 @@ ElementBuffer::ElementBuffer(const unsigned int* indcies, unsigned int count) no
 
 ElementBuffer::~ElementBuffer() noexcept
 {
-    glDeleteBuffers(1, &mRendererID);
+    glDeleteBuffers(1, &m_RendererID);
 }
 
 void ElementBuffer::Bind() const noexcept
 {
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mRendererID);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_RendererID);
 }
 
 void ElementBuffer::Unbind() const noexcept
@@ -37,5 +36,5 @@ void ElementBuffer::SetData(const unsigned int* indcies, unsigned int count) noe
     Bind();
     glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, static_cast<GLsizeiptr>(count * sizeof(unsigned int)), indcies);
 
-    mCount = count;
+    m_Count = count;
 }

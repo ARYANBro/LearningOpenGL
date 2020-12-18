@@ -2,5 +2,5 @@
 Binaries
 
 # Project files
-.vscode/*
+**/.vscode/
 *.code-workspace

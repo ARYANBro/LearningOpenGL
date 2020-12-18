@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Window.h"
+#include "DeltaTime.h"
 
 #include <string>
 
@@ -13,18 +14,33 @@ public:
 
     void Run() noexcept;
 
-protected:
     virtual void OnBegin() noexcept {}
-    virtual void OnUpdate() noexcept {}
+    virtual void OnUpdate([[maybe_unused]] DeltaTime delta) noexcept {}
     virtual void OnRender() noexcept {}
     virtual void OnEnd() noexcept {}
+    virtual void OnMouseMoved([[maybe_unused]] double xPos, [[maybe_unused]] double yPos) noexcept {}
+    virtual void OnMouseScrolled([[maybe_unused]] double xOffset, [[maybe_unused]] double yOffset) noexcept {}
 
-    constexpr Window& GetWindow() noexcept { return mWindow; }
-    constexpr const Window& GetWindow() const noexcept { return mWindow; }
+    static Application* Get() noexcept
+    {
+        return s_Application;
+    }
+
+    constexpr Window& GetWindow() noexcept
+    {
+        return m_Window;
+    }
+
+    constexpr const Window& GetWindow() const noexcept
+    {
+        return m_Window;
+    }
 
 private:
-    Window mWindow;
+    Window m_Window;
+
+    static Application* s_Application;
 
 private:
-    void InitRenderingContext() noexcept;
+    void Init() noexcept;
 };

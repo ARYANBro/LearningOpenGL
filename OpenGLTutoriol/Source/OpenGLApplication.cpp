@@ -3,11 +3,21 @@
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/ElementBuffer.h"
 
+#include "DeltaTime.h"
+#include "Input.h"
+
 #include "GLFW/glfw3.h"
 #include "stb_image.h"
 
 #include <vector>
+#include <cassert>
 #include <iostream>
+
+std::ostream& operator<<(std::ostream& out, const glm::vec3& vec)
+{
+    out << "vec3(" << vec.x << ", " << vec.y << ", " << vec.z << ')';
+    return out;
+}
 
 void OpenGLApplication::OnBegin() noexcept
 {
@@ -20,7 +30,7 @@ void OpenGLApplication::OnBegin() noexcept
         -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 
         -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,   
          0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
          0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
         -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
@@ -57,83 +67,48 @@ void OpenGLApplication::OnBegin() noexcept
 
     const auto vertexBuffer = std::make_shared<VertexBuffer>(vertcies, sizeof(vertcies));
 
-    const BufferLayout layout = {
+    vertexBuffer->SetLayout({
         LayoutDataType::Float3,
         LayoutDataType::Float2
-    };
+    });
 
-    vertexBuffer->SetLayout(layout);
+    m_Vao.AddVertexBuffer(vertexBuffer);
 
-    mVao.AddVertexBuffer(vertexBuffer);
+    m_Shader.BuildFromFile("Assets/Shaders/Shader.glsl");
+    m_PavingStonesTexture.Load("Assets/Textures/PavingStone/PavingStones085_2K_Color.jpg");
+    m_FabricTexture.Load("Assets/Textures/FabricPattern/fabric_pattern_07_col_1_1k.png");    
 
-    LoadAssets();
+    m_PavingStonesTexture.Bind(0);
+    m_FabricTexture.Bind(1);
 
-    mPavingStonesTexture.Bind(0);
+    m_Vao.Bind();
+    m_Shader.Bind();
 
-    mFabricTexture.Bind(1);
-
-    mVao.Bind();
-    mShader.Bind();
-
-    mShader.SetInt("uPavingStonesTexture", 0);
-    mShader.SetInt("uFabricTexture", 1);
-
-    mModelMatrix = glm::mat4(1.0f);
-
-    mViewMatrix = glm::mat4(1.0f);
-    mViewMatrix = glm::translate(mViewMatrix, glm::vec3(0.0f, 0.0f, -3.0f));
-    
-    mProjectionMatrix = glm::perspective(glm::radians(45.0f), static_cast<float>(GetWindow().GetHeight()) / GetWindow().GetWidth(), 0.1f, 100.0f);
-
-    mShader.SetMat4("uProjectionMatrix", mProjectionMatrix);
-    mShader.SetMat4("uViewMatrix", mViewMatrix);
+    m_Shader.SetInt("u_PavingStonesTexture", 0);
+    m_Shader.SetInt("u_FabricTexture", 1);
+    m_Shader.SetMat4("u_ProjectionMatrix", m_ProjectionMatrix);
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+    Input::BindKey("Quit", GLFW_KEY_ESCAPE);
 }
 
-void OpenGLApplication::OnUpdate() noexcept
+void OpenGLApplication::OnUpdate(DeltaTime delta) noexcept
 {
-    auto getKey = [this](int glfwKey)
-    {
-        return glfwGetKey(GetWindow().GetHandle(), glfwKey) == GLFW_PRESS;
-    };
-
-    auto rotate = [&](const glm::vec3& axis, float rotationDegrees = 5.0f)
-    {
-        mModelMatrix = glm::rotate(mModelMatrix, glm::radians(rotationDegrees), axis);
-    };
-
-    if (getKey(GLFW_KEY_ESCAPE))
+    if (Input::IsKeyPressed("Quit"))
     {
         glfwSetWindowShouldClose(GetWindow().GetHandle(), true);
     }
 
-    if (getKey(GLFW_KEY_A))
-    {
-        rotate(glm::vec3(0.0f, -1.0f, 0.0f));
-    }
-    else if (getKey(GLFW_KEY_D))
-    {
-        rotate(glm::vec3(0.0f, 1.0f, 0.0f));
-    }
+    m_Camera.Update(delta);
 
-    if (getKey(GLFW_KEY_W))
-    {
-        rotate(glm::vec3(-1.0f, 0.0f, 0.0f));
-    }
-    else if (getKey(GLFW_KEY_S))
-    {
-        rotate(glm::vec3(1.0f, 0.0f, 0.0f));
-    }
+    std::cerr << m_Camera.GetViewMatrix()[2] << std::endl;
 
-    if (getKey(GLFW_KEY_SPACE))
-    {
-        mModelMatrix = glm::mat4(1.0f);
-    }
-
-    mShader.SetMat4("uModelMatrix", mModelMatrix);
+    m_Shader.Bind();
+    m_Shader.SetMat4("u_ViewMatrix", m_Camera.GetViewMatrix());
 }
 
 void OpenGLApplication::OnRender() noexcept
@@ -141,15 +116,31 @@ void OpenGLApplication::OnRender() noexcept
     glClearColor(0.02f, 0.05f, 0.05f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    for (std::size_t i = 0; i < m_CubePositions.size(); i++)
+    {
+        m_ModelMatrix = glm::mat4(1.0f);
+        m_ModelMatrix = glm::translate(m_ModelMatrix, m_CubePositions[i]);
+        
+        std::srand(i * i);
+
+        if (i % 5 == 0)
+        {
+            glm::vec3 randomRotation(std::rand(), std::rand(), std::rand());
+          
+            m_ModelMatrix = glm::rotate(m_ModelMatrix, 360.0f * (std::rand() * 1.0f / RAND_MAX), randomRotation);
+        }
+
+        m_Shader.Bind();
+        m_Shader.SetMat4("u_ModelMatrix", m_ModelMatrix);
+        
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+    }
 
     glfwSwapBuffers(GetWindow().GetHandle());
     GetWindow().PollEvents();
 }
 
-void OpenGLApplication::LoadAssets() noexcept
+void OpenGLApplication::OnMouseMoved(double xPos, double yPos) noexcept
 {
-    mShader.BuildFromFile("Assets/Shaders/Shader.glsl");
-    mPavingStonesTexture.Load("Assets/Textures/PavingStone/PavingStones085_2K_Color.jpg");
-    mFabricTexture.Load("Assets/Textures/FabricPattern/fabric_pattern_07_col_1_1k.png");    
+    m_Camera.OnMouseMoved(xPos, yPos);
 }

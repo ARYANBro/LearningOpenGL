@@ -13,9 +13,12 @@ public:
     
     void SetData(const unsigned int* indcies, unsigned int count) noexcept;
 
-    constexpr unsigned int GetCount() const noexcept { return mCount; }
+    constexpr unsigned int GetCount() const noexcept
+    {
+        return m_Count;
+    }
 
 private:
-    unsigned int mRendererID;
-    unsigned int mCount;
+    unsigned int m_RendererID;
+    unsigned int m_Count;
 };

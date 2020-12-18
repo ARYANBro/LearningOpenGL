@@ -18,29 +18,48 @@ public:
     using Iterator = std::vector<LayoutDataType>::iterator;
 
 public:
-    BufferLayout() noexcept;
-    BufferLayout(std::initializer_list<LayoutDataType> initList) noexcept;
+    BufferLayout();
+    BufferLayout(std::initializer_list<LayoutDataType> initList);
 
-    ConstIterator begin() const noexcept { return mElements.begin(); }
-    ConstIterator end() const noexcept { return mElements.end(); }
-    Iterator begin() noexcept { return mElements.begin(); }
-    Iterator end() noexcept { return mElements.end(); }
+    std::size_t GetSize() const noexcept
+    {
+         return m_Elements.size();
+    }
+
+    ConstIterator begin() const noexcept 
+    {
+        return m_Elements.begin();
+    }
+
+    ConstIterator end() const noexcept 
+    {
+        return m_Elements.end();
+    }
+
+    Iterator begin() noexcept
+    {
+        return m_Elements.begin();
+    }
+
+    Iterator end() noexcept
+    {
+        return m_Elements.end();
+    }
     
     LayoutDataType& operator[](std::size_t index) noexcept
     {
         assert(index <= GetSize());
-        return mElements[index];
+        return m_Elements[index];
     }
 
     const LayoutDataType& operator[](std::size_t index) const noexcept
     {
         assert(index <= GetSize());
-        return mElements[index];
+        return m_Elements[index];
     }
 
-    std::size_t GetSize() const { return mElements.size(); }
 private:
-    std::vector<LayoutDataType> mElements;
+    std::vector<LayoutDataType> m_Elements;
 };
 
 class VertexBuffer
@@ -53,14 +72,17 @@ public:
     void Bind() const noexcept;
     void Unbind() const noexcept;
 
-    void SetData(const void* data, std::size_t size) noexcept;
-    void SetLayout(const BufferLayout& layout) noexcept { mVertexLayout = layout; }
+    void SetBufferData(const void* data, std::size_t size) noexcept;
+    void SetLayout(const BufferLayout& layout) noexcept { m_VertexLayout = layout; }
 
-    constexpr const BufferLayout& GetLayout() const noexcept { return mVertexLayout; }
+    constexpr const BufferLayout& GetLayout() const noexcept
+    {
+        return m_VertexLayout;
+    }
 
 private:
-    unsigned int mRendererID;
-    BufferLayout mVertexLayout;
+    unsigned int m_RendererID;
+    BufferLayout m_VertexLayout;
 
 private:
     void AllocateBufferData(const void* data, std::size_t size) noexcept;

@@ -35,9 +35,9 @@ private:
     };
 
 private:
-    unsigned int mRendererID;
-    TextureData mTextureData;
+    unsigned int m_RendererID;
+    TextureData m_TextureData;
 
 private:
-    void SetData(TextureData textureData) noexcept;
+    void UploadData(TextureData textureData) noexcept;
 };

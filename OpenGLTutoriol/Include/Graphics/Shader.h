@@ -11,7 +11,7 @@ class Shader
 {
 public:
     Shader() noexcept
-         : mRendererID(0)  {}
+         : m_RendererID(0)  {}
          
     Shader(const std::string& vertexSource, const std::string& fragmentSource);
     Shader(const std::string& filePath);
@@ -27,7 +27,7 @@ public:
     void SetInt(const std::string& name, int value);
 
 private:
-    unsigned int mRendererID;
+    unsigned int m_RendererID;
 
 private:
     GLint GetUniformLocation(const std::string& name);

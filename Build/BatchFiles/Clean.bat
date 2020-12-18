@@ -7,33 +7,33 @@ rem First make sure we have mingw32-make.exe and Binaries directory
 where /Q mingw32-make.exe
 
 if ERRORLEVEL 1 (
-	goto:MinGW32-MakeNotFound
+    goto:MinGW32-MakeNotFound
 )
 
 if not exist Binaries (
-	goto:BinariesDirectoryNotExist
+    goto:BinariesDirectoryNotExist
 )
 
 pushd Binaries
 
 if "%~1" == "" (
-	echo Cleaning Build
+    echo Cleaning Build
 
-	call mingw32-make.exe clean
+    call mingw32-make.exe clean
 
-	echo Sucessfully cleaned Build
+    echo Sucessfully cleaned Build
 ) else (
-	if not exist "%~1" (
-		goto:UserDefinedDirectoryNotFound
-	)
+    if not exist "%~1" (
+        goto:UserDefinedDirectoryNotFound
+    )
 
-	pushd %1
-	echo Cleaning %1
+    pushd %1
+    echo Cleaning %1
 
-	mingw32-make.exe clean
+    mingw32-make.exe clean
 
-	echo Sucessfully cleaned %1
-	popd
+    echo Sucessfully cleaned %1
+    popd
 )
 
 popd
@@ -41,20 +41,20 @@ popd
 goto:Exit
 
 :MinGW32-MakeNotFound
-	echo mingw32-make.exe not found in the system path
-	pause
-	goto:Exit
+    echo mingw32-make.exe not found in the system path
+    pause
+    goto:Exit
 
 :BinariesDirectoryNotExist
-	echo Binaries directory does not exist
-	pause
-	goto:Exit
+    echo Binaries directory does not exist
+    pause
+    goto:Exit
 
 :UserDefinedDirectoryNotFound
-	echo Directory %1 doesn't exist
-	pause
-	goto:Exit
+    echo Directory %1 doesn't exist
+    pause
+    goto:Exit
 
 :Exit
-	popd
-	goto:eof
+    popd
+    goto:eof

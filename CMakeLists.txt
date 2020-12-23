@@ -11,10 +11,10 @@ set(CMAKE_CXX_STANDARD 20)
 set(OutDirectory ${CMAKE_BUILD_TYPE})
 
 # Project targets
-add_subdirectory(OpenGLTutoriol ${OutDirectory}/OpenGLTutoriol)
+add_subdirectory(Sandbox ${OutDirectory}/Sandbox)
 
 # Thirdparty targets
-add_subdirectory(OpenGLTutoriol/ThirdParty/GLFW ${OutDirectory}/ThirdParty/GLFW)
-add_subdirectory(OpenGLTutoriol/ThirdParty/Glad ${OutDirectory}/ThirdParty/Glad)
-add_subdirectory(OpenGLTutoriol/ThirdParty/stb_image ${OutDirectory}/ThirdParty/stb_image)
-add_subdirectory(OpenGLTutoriol/ThirdParty/glm ${OutDirectory}/ThirdParty/glm)
+add_subdirectory(Sandbox/ThirdParty/GLFW ${OutDirectory}/ThirdParty/GLFW)
+add_subdirectory(Sandbox/ThirdParty/Glad ${OutDirectory}/ThirdParty/Glad)
+add_subdirectory(Sandbox/ThirdParty/stb_image ${OutDirectory}/ThirdParty/stb_image)
+add_subdirectory(Sandbox/ThirdParty/glm ${OutDirectory}/ThirdParty/glm)

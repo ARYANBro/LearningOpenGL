@@ -31,15 +31,10 @@ public:
     void SetPosition(const glm::vec3& position) noexcept { m_Position = position; }
     void SetSpeed(float newSpeed) noexcept { m_Speed = newSpeed; }
     void SetMouseSenstivity(float senstivity) noexcept { m_MouseSenstivity = senstivity; }
-    // No pitch yet
-    void SetEulerAngles(float yaw, float pitch)
-    {
-        m_EulerAngles = glm::vec3(yaw, pitch, 0.0f);
-        UpdateVectors();
-    }
-
+    void SetEulerAngles(float yaw, float pitch);
+    
     const glm::mat4& GetViewMatrix() const noexcept { return m_ViewMatrix; }
-    const glm::vec3& GetPosition() noexcept { return m_Position; }
+    const glm::vec3& GetPosition() const noexcept { return m_Position; }
     float GetSpeed() const noexcept { return m_Speed; }
     float GetSenstivity() const noexcept{ return m_MouseSenstivity; }
 

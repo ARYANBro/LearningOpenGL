@@ -117,22 +117,27 @@ void Shader::Unbind() const noexcept
     glUseProgram(0);
 }
 
-void Shader::SetMat4(const std::string& name, const glm::mat4& matrix)
+void Shader::SetMat4(const std::string& name, const glm::mat4& matrix) const
 {
     glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, glm::value_ptr(matrix));
 }
 
-void Shader::SetInt(const std::string& name, int value)
+void Shader::SetInt(const std::string& name, int value) const
 {
     glUniform1i(GetUniformLocation(name), value);
 }
 
-void Shader::SetFloat3(const std::string& name, const glm::vec3& value)
+void Shader::SetFloat(const std::string& name, float value) const
+{
+    glUniform1f(GetUniformLocation(name), value);
+}
+
+void Shader::SetFloat3(const std::string& name, const glm::vec3& value) const
 {
     glUniform3f(GetUniformLocation(name), value.x, value.y, value.y);
 }
 
-GLint Shader::GetUniformLocation(const std::string& name)
+GLint Shader::GetUniformLocation(const std::string& name) const
 {
     GLint location = glGetUniformLocation(m_RendererID, name.c_str());
 

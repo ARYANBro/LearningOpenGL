@@ -38,7 +38,7 @@ void Mesh::SetVertexBuffer(const std::shared_ptr<VertexBuffer>& vertexBuffer)
     m_VertexArray.AddVertexBuffer(vertexBuffer);
 }
 
-void Mesh::Render() noexcept
+void Mesh::Render() const noexcept
 {
     m_Shader->Bind();
     m_VertexArray.Bind();

@@ -32,12 +32,12 @@ bool WASDCameraInputBindings::MoveRight() const
 
 bool WASDCameraInputBindings::MoveUp() const
 {
-    return Input::IsKeyPressed(GLFW_KEY_SPACE);
+    return Input::IsKeyPressed(GLFW_KEY_E);
 }
 
 bool WASDCameraInputBindings::MoveDown() const
 {
-    return Input::IsKeyPressed(GLFW_KEY_LEFT_CONTROL) || Input::IsKeyPressed(GLFW_KEY_RIGHT_CONTROL);
+    return Input::IsKeyPressed(GLFW_KEY_Q);
 }
 
 /*

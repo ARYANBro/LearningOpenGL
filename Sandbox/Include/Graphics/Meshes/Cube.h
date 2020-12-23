@@ -12,10 +12,10 @@
 class Cube : public Mesh
 {
 public:
-    Cube(const std::shared_ptr<Shader>& shader = std::make_shared<Shader>());
+    Cube(const std::shared_ptr<Shader>& shader = Shader::Create());
 
 private:
-    Cube(const std::shared_ptr<VertexBuffer>& vertexBuffer, const std::vector<float>& vertexData, const std::shared_ptr<Shader>& shader = std::make_shared<Shader>());
+    Cube(const std::shared_ptr<VertexBuffer>& vertexBuffer, const std::vector<float>& vertexData, const std::shared_ptr<Shader>& shader = Shader::Create());
     
 private:
     using Mesh::SetVertexData;

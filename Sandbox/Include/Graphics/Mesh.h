@@ -11,16 +11,16 @@ class Mesh
 {
 public:
     Mesh() noexcept = default;
-    Mesh(const std::vector<float>& vertcies, const VertexLayout& layout, const std::shared_ptr<Shader>& shader = std::make_shared<Shader>());
-    Mesh(const std::shared_ptr<VertexBuffer>& vertexBuffer, const std::vector<float>& vertcies, const std::shared_ptr<Shader>& shader = std::make_shared<Shader>());
+    Mesh(const std::vector<float>& vertcies, const VertexLayout& layout, const std::shared_ptr<Shader>& shader);
+    Mesh(const std::shared_ptr<VertexBuffer>& vertexBuffer, const std::vector<float>& vertcies, const std::shared_ptr<Shader>& shader);
     
     void SetIndexData(const std::vector<unsigned int>& indcies) noexcept;
     void SetVertexData(const std::vector<float>& vertcies, const VertexLayout& layout);
     void SetVertexBuffer(const std::shared_ptr<VertexBuffer>& vertexBuffer);
-
-    void Render() noexcept;
-    
     void SetShader(const std::shared_ptr<Shader>& shader) { m_Shader = shader; }
+
+    void Render() const noexcept;
+    
     const std::vector<float>& GetVertexData() const noexcept { return m_VertexData; }
     const VertexArray& GetVertexArray() const noexcept { return m_VertexArray; }
     const std::shared_ptr<Shader>& GetShader() const noexcept { return m_Shader; }

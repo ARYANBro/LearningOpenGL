@@ -2,6 +2,7 @@
 
 #include "DeltaTime.h"
 #include "Input.h"
+#include "Application.h"
 
 #include "glm/gtc/matrix_transform.hpp"
 
@@ -78,11 +79,17 @@ void Camera::OnMouseMoved(double xPos, double yPos) noexcept
 {
     static glm::vec2 s_PreviousMousePos(xPos, yPos); 
     const glm::vec2 offset(xPos - s_PreviousMousePos.x, s_PreviousMousePos.y - yPos);
-  
+
     m_EulerAngles += glm::vec3(offset, 0.0f) * m_MouseSenstivity;
     s_PreviousMousePos = glm::vec2(xPos, yPos);
     m_EulerAngles.y = std::clamp(m_EulerAngles.y, -89.0f, 89.0f);    
 
+    UpdateVectors();
+}
+
+void Camera::SetEulerAngles(float yaw, float pitch)
+{
+    m_EulerAngles = glm::vec3(yaw, pitch, 0.0f);
     UpdateVectors();
 }
 

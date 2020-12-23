@@ -9,15 +9,15 @@ static std::string ShaderTypeToString(GLenum shaderType) noexcept
 {
     switch (shaderType)
     {
-    case GL_VERTEX_SHADER:
-        return "vertex";
-    
-    case GL_FRAGMENT_SHADER:
-        return "fragment";
+        case GL_VERTEX_SHADER:
+            return "vertex";
+        
+        case GL_FRAGMENT_SHADER:
+            return "fragment";
 
-    default:
-        return "null";
-        assert(false);
+        default:
+            return "null";
+            assert(false);
     }
 }
 

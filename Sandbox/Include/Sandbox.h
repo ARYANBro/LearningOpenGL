@@ -4,19 +4,18 @@
 
 #include "Graphics/Shader.h"
 #include "Graphics/Meshes/Cube.h"
-
 #include "Camera.h"
+
 
 #include "glm/glm.hpp"
 
 #include <array>
 
-
-class OpenGLApplication : public Application
+class Sandbox : public Application
 {    
 public:
-    OpenGLApplication(std::uint_fast32_t windowWidth, std::uint_fast32_t windowHeight) noexcept
-        : Application(windowWidth, windowHeight, "OpenGLApplication")
+    Sandbox(std::uint_fast32_t windowWidth, std::uint_fast32_t windowHeight) noexcept
+        : Application(windowWidth, windowHeight, "Sandbox")
     {
     }
 
@@ -29,6 +28,9 @@ public:
 
 private:
     Cube m_Cube;
+    glm::vec3 m_CubePosition;
+    float m_SpecularStrength = 0.1f;
+
     Cube m_Light = Mesh::Share(m_Cube);
 
     glm::vec3 m_LightPosition;
@@ -38,7 +40,6 @@ private:
     std::shared_ptr<Shader> m_LightShader;
 
     glm::mat4 m_ModelMatrix = glm::mat4(1.0f);
-
     glm::mat4 m_ProjectionMatrix = glm::perspective(glm::radians(m_Fov), m_AspectRatio, m_ZNear, m_ZFar);
     float m_Fov = 45.0f;
     const float m_AspectRatio = static_cast<float>(GetWindow().GetWidth()) / GetWindow().GetHeight();

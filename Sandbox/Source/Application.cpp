@@ -56,21 +56,20 @@ void Application::Init() noexcept
     {
         switch (severity)
         {
-        case GL_DEBUG_SEVERITY_HIGH:
-            std::cerr << "OpenGL Severity High: " << message << std::endl;
-            break;
+            case GL_DEBUG_SEVERITY_HIGH:
+                std::cerr << "OpenGL Severity High: " << message << std::endl;
+                break;
 
-        case GL_DEBUG_SEVERITY_MEDIUM:
-            std::cerr << "OpenGL Severity Medium: " << message << std::endl;
-            break;
+            case GL_DEBUG_SEVERITY_MEDIUM:
+                std::cerr << "OpenGL Severity Medium: " << message << std::endl;
+                break;
 
-        case GL_DEBUG_SEVERITY_LOW:
-            std::cerr << "OpenGL Severity Low: " << message << std::endl;
-            break;
+            case GL_DEBUG_SEVERITY_LOW:
+                std::cerr << "OpenGL Severity Low: " << message << std::endl;
+                break;
 
-        case GL_DEBUG_SEVERITY_NOTIFICATION:
-        default:
-            break;
+            case GL_DEBUG_SEVERITY_NOTIFICATION:
+            default: break;
         }
     };
 

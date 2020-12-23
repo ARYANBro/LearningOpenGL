@@ -12,7 +12,7 @@ public:
     using MouseScrolledCallbackFunction = std::function<void(double, double)>;
 
 public:
-    Window(int width = 800, int height = 600, const std::string& name = "Window") noexcept;
+    Window(std::uint_fast32_t width = 800, std::uint_fast32_t height = 600, const std::string& name = "Window") noexcept;
     ~Window();
 
     bool IsClosed() const noexcept;
@@ -21,30 +21,11 @@ public:
     void SetMouseMovedCallback(const MouseMovedCallbackFunction& mouseMovedCallback) noexcept;
     void SetMouseScrolledCallback(const MouseScrolledCallbackFunction& mouseScrolledCallbac) noexcept;
 
-    constexpr const GLFWwindow* GetHandle() const noexcept
-    {
-        return m_WindowHandle;
-    }
-
-    constexpr GLFWwindow* GetHandle() noexcept
-    {
-        return m_WindowHandle;
-    }
-
-    constexpr int GetWidth() const noexcept
-    {
-        return m_Width;
-    }
-
-    constexpr int GetHeight() const noexcept
-    {
-        return m_Height;
-    }
-
-    constexpr const std::string& GetName() const noexcept
-    {
-        return m_Name;
-    }
+    const GLFWwindow* GetHandle() const noexcept { return m_WindowHandle; }
+    GLFWwindow* GetHandle() noexcept { return m_WindowHandle; }
+    std::uint_fast32_t GetWidth() const noexcept { return m_Width; }
+    std::uint_fast32_t GetHeight() const noexcept { return m_Height; }
+    const std::string& GetName() const noexcept { return m_Name; }
 
 private:
     struct WindowData
@@ -52,12 +33,12 @@ private:
         MouseMovedCallbackFunction MouseMovedCallback;
         MouseScrolledCallbackFunction MouseScrolledCallback;
     };
-    
+
 private:
     GLFWwindow* m_WindowHandle;
 
-    int m_Width;
-    int m_Height;
+    std::uint_fast32_t m_Width;
+    std::uint_fast32_t m_Height;
     std::string m_Name;
 
     WindowData m_Data;

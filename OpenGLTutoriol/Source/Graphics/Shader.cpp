@@ -127,6 +127,11 @@ void Shader::SetInt(const std::string& name, int value)
     glUniform1i(GetUniformLocation(name), value);
 }
 
+void Shader::SetFloat3(const std::string& name, const glm::vec3& value)
+{
+    glUniform3f(GetUniformLocation(name), value.x, value.y, value.y);
+}
+
 GLint Shader::GetUniformLocation(const std::string& name)
 {
     GLint location = glGetUniformLocation(m_RendererID, name.c_str());

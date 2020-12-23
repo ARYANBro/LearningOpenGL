@@ -15,7 +15,7 @@ Application::Application() noexcept
     Init();
 }
 
-Application::Application(int windowWidth, int windowHeight, const std::string& windowName) noexcept
+Application::Application(std::uint_fast32_t windowWidth, std::uint_fast32_t windowHeight, const std::string& windowName) noexcept
     : m_Window(windowWidth, windowHeight, windowName)
 {
     Init();

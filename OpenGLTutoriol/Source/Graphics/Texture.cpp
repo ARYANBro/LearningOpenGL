@@ -8,6 +8,7 @@
 
 void Texture::TextureData::Load(const std::string& filePath) noexcept
 {
+    stbi_set_flip_vertically_on_load(true);
     Data = stbi_load(filePath.c_str(), &Width, &Height, &NumOfChannels, 0);
     assert(Data);
 

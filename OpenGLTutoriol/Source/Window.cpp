@@ -4,13 +4,13 @@
 
 #include <cassert>
 
-Window::Window(int width, int height, const std::string& name) noexcept
+Window::Window(std::uint_fast32_t width, std::uint_fast32_t height, const std::string& name) noexcept
     : m_WindowHandle(nullptr), m_Width(width), m_Height(height), m_Name(name)
 {
     const int glfwInitResult = glfwInit();
     assert(glfwInitResult);
 
-    m_WindowHandle = glfwCreateWindow(m_Width, m_Height, m_Name.c_str(), nullptr, nullptr);
+    m_WindowHandle = glfwCreateWindow(static_cast<int>(m_Width), static_cast<int>(m_Height), m_Name.c_str(), nullptr, nullptr);
     assert(m_WindowHandle);
 
     glfwSetWindowUserPointer(m_WindowHandle, &m_Data);

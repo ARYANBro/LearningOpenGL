@@ -13,87 +13,31 @@
 #include <cassert>
 #include <iostream>
 
-std::ostream& operator<<(std::ostream& out, const glm::vec3& vec)
-{
-    out << "vec3(" << vec.x << ", " << vec.y << ", " << vec.z << ')';
-    return out;
-}
-
 void OpenGLApplication::OnBegin() noexcept
 {
-    const float vertcies[] = {
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,   
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-    };
-
-    const auto vertexBuffer = std::make_shared<VertexBuffer>(vertcies, sizeof(vertcies));
-
-    vertexBuffer->SetLayout({
-        LayoutDataType::Float3,
-        LayoutDataType::Float2
+    Input::BindAction("MiddleMouseButtonPressed", [this]()
+    {
+        return glfwGetMouseButton(GetWindow().GetHandle(), GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS;
     });
 
-    m_Vao.AddVertexBuffer(vertexBuffer);
-
-    m_Shader.BuildFromFile("Assets/Shaders/Shader.glsl");
-    m_PavingStonesTexture.Load("Assets/Textures/PavingStone/PavingStones085_2K_Color.jpg");
-    m_FabricTexture.Load("Assets/Textures/FabricPattern/fabric_pattern_07_col_1_1k.png");    
-
-    m_PavingStonesTexture.Bind(0);
-    m_FabricTexture.Bind(1);
-
-    m_Vao.Bind();
-    m_Shader.Bind();
-
-    m_Shader.SetInt("u_PavingStonesTexture", 0);
-    m_Shader.SetInt("u_FabricTexture", 1);
-    m_Shader.SetMat4("u_ProjectionMatrix", m_ProjectionMatrix);
+    m_Camera.SetPosition(glm::vec3(-0.5f, 1.0f, 4.0f));
+    m_Camera.SetEulerAngles(280.0f, -10.0f);
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     Input::BindKey("Quit", GLFW_KEY_ESCAPE);
+
+    m_LightPosition = glm::vec3(1.2f, 1.0f, 2.0f);
+
+    m_CubeShader = std::make_shared<Shader>("Assets/Shaders/Cube.glsl");
+    m_Cube.SetShader(m_CubeShader);
+
+    m_LightShader = std::make_shared<Shader>("Assets/Shaders/Light.glsl");
+    m_Light.SetShader(m_LightShader);
+
+    m_LightColor = glm::vec3(1.0f);
 }
 
 void OpenGLApplication::OnUpdate(DeltaTime delta) noexcept
@@ -103,12 +47,13 @@ void OpenGLApplication::OnUpdate(DeltaTime delta) noexcept
         glfwSetWindowShouldClose(GetWindow().GetHandle(), true);
     }
 
+    if (Input::IsActionTriggered("MiddleMouseButtonPressed"))
+    {
+        m_Fov = 45.0f;
+    }
+
+    m_ProjectionMatrix = glm::perspective(glm::radians(m_Fov), m_AspectRatio, m_ZNear, m_ZFar);
     m_Camera.Update(delta);
-
-    std::cerr << m_Camera.GetViewMatrix()[2] << std::endl;
-
-    m_Shader.Bind();
-    m_Shader.SetMat4("u_ViewMatrix", m_Camera.GetViewMatrix());
 }
 
 void OpenGLApplication::OnRender() noexcept
@@ -116,26 +61,30 @@ void OpenGLApplication::OnRender() noexcept
     glClearColor(0.02f, 0.05f, 0.05f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    for (std::size_t i = 0; i < m_CubePositions.size(); i++)
-    {
-        m_ModelMatrix = glm::mat4(1.0f);
-        m_ModelMatrix = glm::translate(m_ModelMatrix, m_CubePositions[i]);
-        
-        std::srand(i * i);
+    m_ModelMatrix = glm::mat4(1.0f);
 
-        if (i % 5 == 0)
-        {
-            glm::vec3 randomRotation(std::rand(), std::rand(), std::rand());
-          
-            m_ModelMatrix = glm::rotate(m_ModelMatrix, 360.0f * (std::rand() * 1.0f / RAND_MAX), randomRotation);
-        }
+    m_CubeShader->Bind();
+    m_CubeShader->SetFloat3("u_ObjectColor", { 1.0f, 0.4f, 0.4f });
+    m_CubeShader->SetFloat3("u_LightColor", m_LightColor);
 
-        m_Shader.Bind();
-        m_Shader.SetMat4("u_ModelMatrix", m_ModelMatrix);
-        
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-    }
+    m_CubeShader->SetMat4("u_ModelMatrix", m_ModelMatrix);
+    m_CubeShader->SetMat4("u_ViewMatrix", m_Camera.GetViewMatrix());
+    m_CubeShader->SetMat4("u_ProjectionMatrix", m_ProjectionMatrix);
 
+    m_Cube.Render();
+
+    m_ModelMatrix = glm::translate(m_ModelMatrix, glm::vec3(m_LightPosition));
+    m_ModelMatrix = glm::scale(m_ModelMatrix, glm::vec3(0.2f));
+
+    m_LightShader->Bind();
+    m_LightShader->SetFloat3("u_LightColor", m_LightColor);
+
+    m_LightShader->SetMat4("u_ModelMatrix", m_ModelMatrix);
+    m_LightShader->SetMat4("u_ViewMatrix", m_Camera.GetViewMatrix());
+    m_LightShader->SetMat4("u_ProjectionMatrix", m_ProjectionMatrix);
+
+    m_Light.Render();
+    
     glfwSwapBuffers(GetWindow().GetHandle());
     GetWindow().PollEvents();
 }
@@ -143,4 +92,10 @@ void OpenGLApplication::OnRender() noexcept
 void OpenGLApplication::OnMouseMoved(double xPos, double yPos) noexcept
 {
     m_Camera.OnMouseMoved(xPos, yPos);
+}
+
+void OpenGLApplication::OnMouseScrolled([[maybe_unused]] double xOffset, double yOffset) noexcept
+{
+    m_Fov -= static_cast<float>(yOffset);
+    m_Fov = std::clamp(m_Fov, 1.0f, 150.0f);
 }

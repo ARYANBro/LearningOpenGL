@@ -8,10 +8,7 @@ public:
     using Clock = std::chrono::high_resolution_clock;
 
 public:
-    operator float() noexcept
-    {
-        return m_DeltaTime.count();
-    }
+    operator float() noexcept { return m_DeltaTime.count(); }
 
 private:
     std::chrono::time_point<Clock> m_LastFrameTime;

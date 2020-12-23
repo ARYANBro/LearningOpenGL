@@ -25,6 +25,7 @@ public:
     
     void SetMat4(const std::string& name, const glm::mat4& matrix);
     void SetInt(const std::string& name, int value);
+    void SetFloat3(const std::string& name, const glm::vec3& value);
 
 private:
     unsigned int m_RendererID;

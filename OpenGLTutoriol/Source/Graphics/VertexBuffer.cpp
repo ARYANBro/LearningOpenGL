@@ -5,7 +5,7 @@
 #include <numeric>
 #include <cassert>
 
-BufferLayout::BufferLayout()
+VertexLayout::VertexLayout()
     : m_Elements()
 {
     GLint maxVertexAttribs;
@@ -14,8 +14,8 @@ BufferLayout::BufferLayout()
     m_Elements.reserve(static_cast<std::size_t>(maxVertexAttribs));
 }
 
-BufferLayout::BufferLayout(std::initializer_list<LayoutDataType> initList)
-    : BufferLayout()
+VertexLayout::VertexLayout(std::initializer_list<LayoutDataType> initList)
+    : VertexLayout()
 {
     for (const auto element : initList)
     {
@@ -24,13 +24,12 @@ BufferLayout::BufferLayout(std::initializer_list<LayoutDataType> initList)
 }
 
 VertexBuffer::VertexBuffer(std::size_t size) noexcept
-    : m_RendererID(RendererAPI::CreateBuffer()), m_VertexLayout()
+    : VertexBuffer(nullptr, size)
 {
-    AllocateBufferData(nullptr, size);
 }
 
 VertexBuffer::VertexBuffer(const void* data, std::size_t size) noexcept
-    : m_RendererID(RendererAPI::CreateBuffer()), m_VertexLayout()
+    : m_RendererID(RendererAPI::CreateBuffer()), m_VertexLayout(), m_Size(size)
 {
     AllocateBufferData(data, size);
 }

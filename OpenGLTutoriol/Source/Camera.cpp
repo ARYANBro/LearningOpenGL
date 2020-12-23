@@ -35,8 +35,8 @@ static glm::mat4 LookAt(const glm::vec3& position, const glm::vec3& target, cons
     return rotation * translation;
 }
 
-Camera::Camera(std::shared_ptr<CameraInputBindings> inputBindings) noexcept
-    : Up(m_Up), Forward(m_Forward), Right(m_Right), m_Position(), m_ViewMatrix(1.0f), m_Speed(2.5f), m_Up(), m_Forward(0.0f, 0.0f, -1.0f), m_Right(), 
+Camera::Camera(const std::shared_ptr<CameraInputBindings>& inputBindings) noexcept
+    : Up(m_Up), Forward(m_Forward), Right(m_Right), m_Position(), m_ViewMatrix(1.0f), m_Speed(2.0f), m_Up(), m_Forward(0.0f, 0.0f, -1.0f), m_Right(), 
       m_WorldUp(0.0f, 1.0f, 0.0f), m_MouseSenstivity(0.3f), m_EulerAngles(270.0f, 0.0f, 0.0f), m_InputBindings(inputBindings)
 {
     UpdateVectors();

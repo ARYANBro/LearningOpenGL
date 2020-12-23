@@ -5,7 +5,6 @@
 
 #include <memory>
 
-
 class VertexArray
 {
 public:
@@ -18,15 +17,9 @@ public:
     void Bind() const noexcept;
     void Unbind() const noexcept;
 
-    constexpr const std::vector<std::shared_ptr<VertexBuffer>>& GetVertexBuffers() const noexcept
-    {
-        return m_VertexBuffers;
-    }
-
-    constexpr const std::shared_ptr<ElementBuffer>& GetElementBuffer() const noexcept
-    {
-        return m_ElementBuffer;
-    }
+    const std::vector<std::shared_ptr<VertexBuffer>>& GetVertexBuffers() const noexcept { return m_VertexBuffers; }
+    const std::shared_ptr<VertexBuffer>& GetVertexBuffer(std::size_t index) const noexcept { return m_VertexBuffers.at(index); }
+    const std::shared_ptr<ElementBuffer>& GetElementBuffer() const noexcept { return m_ElementBuffer; }
 
 private:
     unsigned int m_RendererID;
@@ -36,4 +29,5 @@ private:
 
 private:
     void Delete() noexcept;
+    void CalculateOffsetAndStride(const VertexBuffer& vertexBuffer, unsigned int vertexBufferIndex);
 };

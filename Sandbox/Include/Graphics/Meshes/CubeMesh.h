@@ -9,13 +9,13 @@
 #include <string>
 #include <array>
 
-class Cube : public Mesh
+class CubeMesh : public Mesh
 {
 public:
-    Cube(const std::shared_ptr<Shader>& shader = Shader::Create());
+    CubeMesh(const std::shared_ptr<Shader>& shader = Shader::Create());
 
 private:
-    Cube(const std::shared_ptr<VertexBuffer>& vertexBuffer, const std::vector<float>& vertexData, const std::shared_ptr<Shader>& shader = Shader::Create());
+    CubeMesh(const std::shared_ptr<VertexBuffer>& vertexBuffer, const std::vector<float>& vertexData, const std::shared_ptr<Shader>& shader = Shader::Create());
     
 private:
     using Mesh::SetVertexData;

@@ -105,7 +105,7 @@ public:
 
     virtual void OnImGuiRender() noexcept override
     {
-        if (ImGui::CollapsingHeader("Rendering Options"))
+        if (ImGui::CollapsingHeader("Rendering Options", ImGuiTreeNodeFlags_SpanFullWidth))
         {
             ImGui::Checkbox("Diffuse", &m_DiffuseChecked);
             ImGui::Checkbox("Specular", &m_SpecularChecked);

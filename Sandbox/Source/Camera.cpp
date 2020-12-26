@@ -4,7 +4,7 @@
 #include "Input.h"
 #include "Application.h"
 
-#include "glm/gtc/matrix_transform.hpp"
+#include <glm/gtc/matrix_transform.hpp>
 
 #include <cassert>
 
@@ -36,72 +36,103 @@ static glm::mat4 LookAt(const glm::vec3& position, const glm::vec3& target, cons
     return rotation * translation;
 }
 
-Camera::Camera(const std::shared_ptr<CameraInputBindings>& inputBindings) noexcept
-    : Up(m_Up), Forward(m_Forward), Right(m_Right), m_Position(), m_ViewMatrix(1.0f), m_Speed(2.0f), m_Up(), m_Forward(0.0f, 0.0f, -1.0f), m_Right(), 
-      m_WorldUp(0.0f, 1.0f, 0.0f), m_MouseSenstivity(0.3f), m_EulerAngles(270.0f, 0.0f, 0.0f), m_InputBindings(inputBindings)
+Camera::Camera(glm::vec3 position, float speed, float senstivity) noexcept
+    : m_Position(position), m_ViewMatrix(1.0f), m_Speed(speed), m_Up(), m_Forward(0.0f, 0.0f, -1.0f), m_Right(), 
+    m_WorldUp(0.0f, 1.0f, 0.0f), m_MouseSenstivity(senstivity), m_EulerAngles(270.0f, 0.0f, 0.0f), m_InputBindings(CameraInputBindings::Create<DefaultCameraInputBindings>())
 {
-    UpdateVectors();
+}
+
+Camera::Camera(const std::shared_ptr<CameraInputBindings>& inputBindings) noexcept
+    : Camera({}, 2.0f, 8.0f)
+{
+    m_InputBindings = inputBindings;
+    UpdateView();
 }
 
 void Camera::Update(DeltaTime delta) noexcept
 {
-    if (m_InputBindings->MoveForward())
-    {
-        m_Position += m_Speed * delta * m_Forward;
-    }
-    else if (m_InputBindings->MoveBackward())
-    {
-        m_Position -= m_Speed * delta * m_Forward;
-    }
-
-    if (m_InputBindings->MoveLeft())
-    {
-        m_Position -= m_Speed * delta * m_Right;
-    }
-    else if (m_InputBindings->MoveRight())
-    {
-        m_Position += m_Speed * delta * m_Right;
-    }
-
-    if (m_InputBindings->MoveUp())
-    {
-        m_Position += m_Speed * delta * m_Up;
-    }
-    else if (m_InputBindings->MoveDown())
-    {
-        m_Position -= m_Speed * delta * m_Up;
-    }
-
-    m_ViewMatrix = LookAt(m_Position, m_Position + m_Forward, m_WorldUp);
-}
-
-void Camera::OnMouseMoved(double xPos, double yPos) noexcept
-{
-    static glm::vec2 s_PreviousMousePos(xPos, yPos); 
-    const glm::vec2 offset(xPos - s_PreviousMousePos.x, s_PreviousMousePos.y - yPos);
-
-    m_EulerAngles += glm::vec3(offset, 0.0f) * m_MouseSenstivity;
-    s_PreviousMousePos = glm::vec2(xPos, yPos);
-    m_EulerAngles.y = std::clamp(m_EulerAngles.y, -89.0f, 89.0f);    
-
-    UpdateVectors();
+    UpdatePosition(delta);
+    UpdateRotation(delta);
+    UpdateView();
 }
 
 void Camera::SetEulerAngles(float yaw, float pitch)
 {
     m_EulerAngles = glm::vec3(yaw, pitch, 0.0f);
-    UpdateVectors();
+    UpdateView();
 }
 
-void Camera::UpdateVectors() noexcept
+glm::vec3 Camera::GetUpDirection() const noexcept
 {
-    m_Forward = glm::vec3(
+    return glm::normalize(glm::cross(m_Right, m_Forward));
+}
+
+glm::vec3 Camera::GetForwardDirection() const noexcept
+{
+    return glm::normalize(glm::vec3(
         std::cos(glm::radians(m_EulerAngles.x)) * std::cos(glm::radians(m_EulerAngles.y)),
         std::sin(glm::radians(m_EulerAngles.y)),
         std::sin(glm::radians(m_EulerAngles.x)) * std::cos(glm::radians(m_EulerAngles.y))
-    );
+    ));
+}
 
-    m_Forward = glm::normalize(m_Forward);
-    m_Right = glm::normalize(glm::cross(m_Forward, m_WorldUp));
-    m_Up = glm::normalize(glm::cross(m_Right, m_Forward));
+glm::vec3 Camera::GetRightDirection() const noexcept
+{
+    return glm::normalize(glm::cross(m_Forward, m_WorldUp));
+}
+
+void Camera::UpdateView() noexcept
+{
+    m_Forward = GetForwardDirection();
+    m_Right = GetRightDirection();
+    m_Up = GetUpDirection();
+
+    m_ViewMatrix = LookAt(m_Position, m_Position + m_Forward, m_WorldUp);
+}
+
+void Camera::UpdateRotation(DeltaTime delta) noexcept
+{
+    glm::vec2 mouse = Input::GetMousePosition();
+    glm::vec2 offset = (mouse - m_PreviousMousePos) * delta.operator float();
+    m_PreviousMousePos = mouse;
+
+    if ((Input::IsKeyPressed(GLFW_KEY_LEFT_ALT) && Input::IsMouseButtonPressed(GLFW_MOUSE_BUTTON_MIDDLE)) ||
+        Input::IsMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT))
+    {
+        m_EulerAngles += glm::vec3(offset.x, -offset.y, 0.0f) * m_MouseSenstivity;
+        m_EulerAngles.y = std::clamp(m_EulerAngles.y, -89.0f, 89.0f);    
+    }
+}
+
+void Camera::UpdatePosition(DeltaTime delta) noexcept
+{
+    if (Input::IsMouseButtonPressed(GLFW_MOUSE_BUTTON_RIGHT))
+    {
+        if (m_InputBindings->MoveForward())
+        {
+            m_Position += m_Speed * delta * m_Forward;
+        }
+        else if (m_InputBindings->MoveBackward())
+        {
+            m_Position -= m_Speed * delta * m_Forward;
+        }
+
+        if (m_InputBindings->MoveLeft())
+        {
+            m_Position -= m_Speed * delta * m_Right;
+        }
+        else if (m_InputBindings->MoveRight())
+        {
+            m_Position += m_Speed * delta * m_Right;
+        }
+
+        if (m_InputBindings->MoveUp())
+        {
+            m_Position += m_Speed * delta * m_Up;
+        }
+        else if (m_InputBindings->MoveDown())
+        {
+            m_Position -= m_Speed * delta * m_Up;
+        }
+    }
 }

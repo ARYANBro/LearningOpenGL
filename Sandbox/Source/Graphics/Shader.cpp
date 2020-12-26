@@ -2,8 +2,8 @@
 
 #include "Graphics/RendererAPI.h"
 
-#include "glad/glad.h"
-#include "glm/gtc/type_ptr.hpp"
+#include <glad/glad.h>
+#include <glm/gtc/type_ptr.hpp>
 
 #include <filesystem>
 #include <stdexcept>
@@ -120,6 +120,11 @@ void Shader::Unbind() const noexcept
 void Shader::SetMat4(const std::string& name, const glm::mat4& matrix) const
 {
     glUniformMatrix4fv(GetUniformLocation(name), 1, GL_FALSE, glm::value_ptr(matrix));
+}
+
+void Shader::SetBool(const std::string& name, bool value) const
+{
+    glUniform1i(GetUniformLocation(name), value);
 }
 
 void Shader::SetInt(const std::string& name, int value) const

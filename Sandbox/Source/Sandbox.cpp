@@ -6,8 +6,12 @@
 #include "DeltaTime.h"
 #include "Input.h"
 
-#include "GLFW/glfw3.h"
-#include "stb_image.h"
+#include <GLFW/glfw3.h>
+#include <stb_image.h>
+
+#include <imgui.h>
+#include <backends/imgui_impl_glfw.h>
+#include <backends/imgui_impl_opengl3.h>
 
 #include <vector>
 #include <cassert>
@@ -15,17 +19,16 @@
 
 void Sandbox::OnBegin() noexcept
 {
-    Input::BindAction("MiddleMouseButtonPressed", [this]()
-    {
-        return glfwGetMouseButton(GetWindow().GetHandle(), GLFW_MOUSE_BUTTON_MIDDLE) == GLFW_PRESS;
-    });
-
-    m_Camera.SetPosition(glm::vec3(-0.5f, 1.0f, 4.0f));
     m_Camera.SetEulerAngles(280.0f, -10.0f);
 
     try
     {
         m_CubeShader = Shader::Create("Assets/Shaders/Cube.glsl");
+        m_CubeShader->Bind();
+        m_CubeShader->SetFloat("u_SpecularStrength", m_SpecularStrength);
+        m_CubeShader->SetInt("u_Shininess", m_Shininess);
+        m_CubeShader->SetFloat("u_AmbientStrength", m_AmbientStrength);
+
         m_Cube.SetShader(m_CubeShader);
 
         m_LightShader = Shader::Create("Assets/Shaders/Light.glsl");
@@ -36,13 +39,9 @@ void Sandbox::OnBegin() noexcept
         std::cerr << e.what() << std::endl;
     }
 
-    m_LightColor = glm::vec3((std::cos(glfwGetTime()) + 1.5) / 2);
-    m_LightPosition = glm::vec3(1.2f, 1.0f, 2.0f);
-    m_CubePosition = glm::vec3(0.0f, 0.0f, 0.0f);
-
-    m_CubeShader->Bind();
-    m_CubeShader->SetInt("u_Shininess", 2);
-    m_CubeShader->SetFloat("u_SpecularStrength", 0.5f);
+    m_LightColor = { 1.0f, 1.0f, 1.0f };
+    m_LightPosition = { 1.2f, 1.0f, 2.0f };
+    m_CubePosition = { 0.0f, 0.0f, 0.0f };
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
@@ -56,77 +55,51 @@ void Sandbox::OnUpdate(DeltaTime delta) noexcept
         glfwSetWindowShouldClose(GetWindow().GetHandle(), GLFW_TRUE);
     }
 
-    if (Input::IsActionTriggered("MiddleMouseButtonPressed"))
+    if (Input::IsMouseButtonPressed(GLFW_MOUSE_BUTTON_MIDDLE))
     {
         m_Fov = 45.0f;
     }
 
     m_CubeShader->Bind();
-    if (Input::IsKeyPressed(GLFW_KEY_0) && !Input::IsKeyPressed(GLFW_KEY_LEFT_CONTROL))        // 0 is normal shading
+    if (m_DiffuseChecked)
     {
-        m_CubeShader->SetInt("u_Mode", 0);
+        m_CubeShader->SetBool("u_EnableDiffuse", true);
     }
-    else if (Input::IsKeyPressed(GLFW_KEY_1) && !Input::IsKeyPressed(GLFW_KEY_LEFT_CONTROL))   // 1 is diffuse shading
+    else
     {
-        m_CubeShader->SetInt("u_Mode", 1);
-    }
-    else if (Input::IsKeyPressed(GLFW_KEY_2) && !Input::IsKeyPressed(GLFW_KEY_LEFT_CONTROL))   // 2 is ambient color
-    {
-        m_CubeShader->SetInt("u_Mode", 2);
-    }
-    else if (Input::IsKeyPressed(GLFW_KEY_3) && !Input::IsKeyPressed(GLFW_KEY_LEFT_CONTROL))   // 3 is specular
-    {
-        m_CubeShader->SetInt("u_Mode", 3);
-    }
-    else if (Input::IsKeyPressed(GLFW_KEY_4) && !Input::IsKeyPressed(GLFW_KEY_LEFT_CONTROL))   // 4 are normals
-    {
-        m_CubeShader->SetInt("u_Mode", 4);
+        m_CubeShader->SetBool("u_EnableDiffuse", false);
     }
 
-
-    if (Input::IsKeyPressed(GLFW_KEY_0) && Input::IsKeyPressed(GLFW_KEY_LEFT_CONTROL))        
+    if (m_SpecularChecked)
     {
-        m_CubeShader->SetInt("u_Shininess", 2);
+        m_CubeShader->SetBool("u_EnableSpecular", true);
     }
-    else if (Input::IsKeyPressed(GLFW_KEY_1) && Input::IsKeyPressed(GLFW_KEY_LEFT_CONTROL))  
+    else
     {
-        m_CubeShader->SetInt("u_Shininess", 4);
-    }
-    else if (Input::IsKeyPressed(GLFW_KEY_2) && Input::IsKeyPressed(GLFW_KEY_LEFT_CONTROL))   
-    {
-        m_CubeShader->SetInt("u_Shininess", 8);
-    }
-    else if (Input::IsKeyPressed(GLFW_KEY_3) && Input::IsKeyPressed(GLFW_KEY_LEFT_CONTROL))
-    {
-        m_CubeShader->SetInt("u_Shininess", 16);
-    }
-    else if (Input::IsKeyPressed(GLFW_KEY_4) && Input::IsKeyPressed(GLFW_KEY_LEFT_CONTROL))
-    {
-        m_CubeShader->SetInt("u_Shininess", 32);
-    }
-    else if (Input::IsKeyPressed(GLFW_KEY_5) && Input::IsKeyPressed(GLFW_KEY_LEFT_CONTROL))  
-    {
-        m_CubeShader->SetInt("u_Shininess", 64);
-    }
-    else if (Input::IsKeyPressed(GLFW_KEY_6) && Input::IsKeyPressed(GLFW_KEY_LEFT_CONTROL))
-    {
-        m_CubeShader->SetInt("u_Shininess", 128);
-    }
-    else if (Input::IsKeyPressed(GLFW_KEY_7) && Input::IsKeyPressed(GLFW_KEY_LEFT_CONTROL))
-    {
-        m_CubeShader->SetInt("u_Shininess", 256);
+        m_CubeShader->SetBool("u_EnableSpecular", false);
     }
 
+    if (m_AmbientChecked)
+    {
+        m_CubeShader->SetBool("u_EnableAmbient", true);
+    }
+    else
+    {
+        m_CubeShader->SetBool("u_EnableAmbient", false);
+    }
 
+    m_CubeShader->SetFloat("u_SpecularStrength", m_SpecularStrength);
+    m_CubeShader->SetInt("u_Shininess", m_Shininess);
+    m_CubeShader->SetFloat("u_AmbientStrength", m_AmbientStrength);
+    
     m_ProjectionMatrix = glm::perspective(glm::radians(m_Fov), m_AspectRatio, m_ZNear, m_ZFar);
+    m_LightPosition.x = std::cos(glfwGetTime());
     m_Camera.Update(delta);
+    m_FrameTime = delta;
 }
 
 void Sandbox::OnRender() noexcept
 {
-    glClearColor(0.02f, 0.05f, 0.05f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     m_ModelMatrix = glm::mat4(1.0f);
 
     m_CubeShader->Bind();
@@ -142,17 +115,18 @@ void Sandbox::OnRender() noexcept
         m_CubeShader->SetMat4("u_ModelMatrix", m_ModelMatrix);
         m_CubeShader->SetMat4("u_ViewMatrix", m_Camera.GetViewMatrix());
         m_CubeShader->SetMat4("u_ProjectionMatrix", m_ProjectionMatrix);
+
     }
     catch (const std::exception& e)
     {
         std::cerr << e.what() << std::endl;
     }
-    
+
     m_Cube.Render();
 
     m_ModelMatrix = glm::mat4(1.0f);
 
-    m_ModelMatrix = glm::translate(m_ModelMatrix, glm::vec3(m_LightPosition));
+    m_ModelMatrix = glm::translate(m_ModelMatrix, m_LightPosition);
     m_ModelMatrix = glm::scale(m_ModelMatrix, glm::vec3(0.2f));
 
     m_LightShader->Bind();
@@ -171,17 +145,34 @@ void Sandbox::OnRender() noexcept
     }
 
     m_Light.Render();
-    glfwSwapBuffers(GetWindow().GetHandle());
-    GetWindow().PollEvents();
 }
 
-void Sandbox::OnMouseMoved(double xPos, double yPos) noexcept
+void Sandbox::OnImGuiRender() noexcept
 {
-    m_Camera.OnMouseMoved(xPos, yPos);
-}
+    ImGui::Begin("Stats");
+    ImGui::Text("Frametime: %.4gms", m_FrameTime * 1000);
+    ImGui::End();
 
-void Sandbox::OnMouseScrolled([[maybe_unused]] double xOffset, double yOffset) noexcept
-{
-    m_Fov -= static_cast<float>(yOffset);
-    m_Fov = std::clamp(m_Fov, 1.0f, 150.0f);
+    ImGui::Begin("Properties", nullptr, ImGuiWindowFlags_MenuBar);
+
+    if (ImGui::CollapsingHeader("Rendering Options"))
+    {
+        ImGui::Checkbox("Diffuse", &m_DiffuseChecked);
+        ImGui::Checkbox("Specular", &m_SpecularChecked);
+
+        if (m_SpecularChecked)
+        {
+            ImGui::SliderFloat("Specular Strength", &m_SpecularStrength, 0.0f, 1.0f, nullptr, 1.0f);
+            ImGui::SliderInt("Shininess", &m_Shininess, 2, 256);
+        }
+
+        ImGui::Checkbox("Ambient", &m_AmbientChecked);
+
+        if (m_AmbientChecked)
+        {
+            ImGui::SliderFloat("Ambient Strength", &m_AmbientStrength, 0.0f, 0.5f, nullptr, 1.0f);
+        }
+    }
+
+    ImGui::End();
 }

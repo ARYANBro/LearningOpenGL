@@ -1,6 +1,6 @@
 #include "Window.h"
 
-#include "GLFW/glfw3.h"
+#include <GLFW/glfw3.h>
 
 #include <cassert>
 
@@ -14,7 +14,6 @@ Window::Window(std::uint_fast32_t width, std::uint_fast32_t height, const std::s
     assert(m_WindowHandle);
 
     glfwSetWindowUserPointer(m_WindowHandle, &m_Data);
-    glfwSetInputMode(m_WindowHandle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
 Window::~Window() noexcept
@@ -30,6 +29,11 @@ bool Window::IsClosed() const noexcept
 void Window::PollEvents() const noexcept
 {
     glfwPollEvents();
+}
+
+void Window::SwapBuffers() const noexcept
+{
+    glfwSwapBuffers(m_WindowHandle);
 }
 
 void Window::SetMouseMovedCallback(const MouseMovedCallbackFunction& mouseMovedFunction) noexcept
@@ -51,5 +55,16 @@ void Window::SetMouseScrolledCallback(const MouseScrolledCallbackFunction& mouse
     {
         WindowData* data = static_cast<WindowData*>(glfwGetWindowUserPointer(window));
         data->MouseScrolledCallback(xOffset, yOffset);
+    });
+}
+
+void Window::SetKeyCallback(const KeyCallbackFunction& keyCallback) noexcept
+{
+    m_Data.KeyCallback = keyCallback;
+    
+    glfwSetKeyCallback(m_WindowHandle, [](GLFWwindow* window, int key, int scancode, int action, int mods)
+    {
+        WindowData* data = static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+        data->KeyCallback(key, action);
     });
 }

@@ -2,7 +2,7 @@
 
 #include "Graphics/VertexBuffer.h"
 
-#include "glad/glad.h"
+#include <glad/glad.h>
 
 Mesh::Mesh(const std::vector<float>& vertcies, const VertexLayout& layout, const std::shared_ptr<Shader>& shader)
     : m_VertexData(vertcies), m_VertexArray(), m_Shader(shader)

@@ -1,7 +1,11 @@
 #include "Application.h"
 
-#include "GLFW/glfw3.h"
-#include "glad/glad.h"
+#include <GLFW/glfw3.h>
+#include <glad/glad.h>
+
+#include <imgui.h>
+#include <backends/imgui_impl_opengl3.h>
+#include <backends/imgui_impl_glfw.h>
 
 #include <chrono>
 #include <iostream>
@@ -21,6 +25,13 @@ Application::Application(std::uint_fast32_t windowWidth, std::uint_fast32_t wind
     Init();
 }
 
+Application::~Application() noexcept
+{
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+}
+
 void Application::Run() noexcept
 {
     OnBegin();
@@ -32,7 +43,11 @@ void Application::Run() noexcept
         delta.Calculate();
 
         OnUpdate(delta);
+
+        OnBeginFrame();
         OnRender();
+        ImGuiRender();
+        OnEndFrame();
     }
 
     OnEnd();
@@ -91,4 +106,39 @@ void Application::Init() noexcept
     {
         OnMouseScrolled(xOffset, yOffset);
     });
+
+    m_Window.SetKeyCallback([this](int key, int action)
+    {
+        OnKeyPressed(key, action);
+    });
+
+    ImGui::CreateContext();
+    ImGui::StyleColorsDark();
+    ImGui_ImplGlfw_InitForOpenGL(GetWindow().GetHandle(), true);
+    ImGui_ImplOpenGL3_Init("#version 460 core");
+}
+
+void Application::OnBeginFrame() const noexcept
+{
+    glClearColor(0.02f, 0.05f, 0.05f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+void Application::OnEndFrame() const noexcept
+{
+    m_Window.SwapBuffers();
+    m_Window.PollEvents();
+}
+
+void Application::ImGuiRender() noexcept
+{
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+
+    OnImGuiRender();
+
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 }

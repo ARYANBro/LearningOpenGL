@@ -61,31 +61,39 @@ void Sandbox::OnUpdate(DeltaTime delta) noexcept
     }
 
     m_CubeShader->Bind();
-    if (m_DiffuseChecked)
-    {
-        m_CubeShader->SetBool("u_EnableDiffuse", true);
-    }
-    else
-    {
-        m_CubeShader->SetBool("u_EnableDiffuse", false);
-    }
 
-    if (m_SpecularChecked)
+    try
     {
-        m_CubeShader->SetBool("u_EnableSpecular", true);
-    }
-    else
-    {
-        m_CubeShader->SetBool("u_EnableSpecular", false);
-    }
+        if (m_DiffuseChecked)
+        {
+            m_CubeShader->SetBool("u_EnableDiffuse", true);
+        }
+        else
+        {
+            m_CubeShader->SetBool("u_EnableDiffuse", false);
+        }
 
-    if (m_AmbientChecked)
-    {
-        m_CubeShader->SetBool("u_EnableAmbient", true);
+        if (m_SpecularChecked)
+        {
+            m_CubeShader->SetBool("u_EnableSpecular", true);
+        }
+        else
+        {
+            m_CubeShader->SetBool("u_EnableSpecular", false);
+        }
+
+        if (m_AmbientChecked)
+        {
+            m_CubeShader->SetBool("u_EnableAmbient", true);
+        }
+        else
+        {
+            m_CubeShader->SetBool("u_EnableAmbient", false);
+        }
     }
-    else
+    catch (const std::exception& e)
     {
-        m_CubeShader->SetBool("u_EnableAmbient", false);
+        std::cerr << e.what() << std::endl;
     }
 
     m_CubeShader->SetFloat("u_SpecularStrength", m_SpecularStrength);

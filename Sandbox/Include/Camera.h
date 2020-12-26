@@ -18,11 +18,7 @@ class DeltaTime;
 class Camera
 {
 public:
-    const glm::vec3& Up;
-    const glm::vec3& Forward;
-    const glm::vec3& Right;
-
-public:
+    Camera(const glm::vec3& position, float speed, float senstivity) noexcept;
     Camera(const std::shared_ptr<CameraInputBindings>& inputBindings = CameraInputBindings::Create<DefaultCameraInputBindings>()) noexcept;
 
     void Update(DeltaTime delta) noexcept;
@@ -37,6 +33,10 @@ public:
     const glm::vec3& GetPosition() const noexcept { return m_Position; }
     float GetSpeed() const noexcept { return m_Speed; }
     float GetSenstivity() const noexcept{ return m_MouseSenstivity; }
+
+    glm::vec3 GetUpDirection() const noexcept;
+    glm::vec3 GetForwardDirection() const noexcept;
+    glm::vec3 GetRightDirection() const noexcept;
 
 private:
     glm::vec3 m_Position;
@@ -55,6 +55,11 @@ private:
 
     std::shared_ptr<CameraInputBindings> m_InputBindings;
 
+    glm::vec2 m_PreviousMousePos;
+
 private:
     void UpdateVectors() noexcept;
+    void UpdatePosition(DeltaTime delta) noexcept;
+    void UpdateRotation(DeltaTime delta) noexcept;
+    void UpdateView() noexcept;
 };

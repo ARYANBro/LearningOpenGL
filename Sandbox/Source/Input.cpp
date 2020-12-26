@@ -34,9 +34,9 @@ bool Input::IsKeyPressed(int glfwKey) noexcept
     return glfwGetKey(Application::Get()->GetWindow().GetHandle(), glfwKey) == GLFW_PRESS;
 }
 
-bool Input::IsMouseButtonPressed(int glfwMouseButtonKey) noexcept
+bool Input::IsMouseButtonPressed(int glfwMoseButton) noexcept
 {
-    return glfwGetMouseButton(Application::Get()->GetWindow().GetHandle(), glfwMouseButtonKey) == GLFW_PRESS;
+    return glfwGetMouseButton(Application::Get()->GetWindow().GetHandle(), glfwMoseButton) == GLFW_PRESS;
 }
 
 void Input::BindAction(const std::string& name, const ActionCondition& condition) noexcept

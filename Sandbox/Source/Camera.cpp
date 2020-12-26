@@ -36,9 +36,10 @@ static glm::mat4 LookAt(const glm::vec3& position, const glm::vec3& target, cons
     return rotation * translation;
 }
 
-Camera::Camera(glm::vec3 position, float speed, float senstivity) noexcept
+Camera::Camera(const glm::vec3& position, float speed, float senstivity) noexcept
     : m_Position(position), m_ViewMatrix(1.0f), m_Speed(speed), m_Up(), m_Forward(0.0f, 0.0f, -1.0f), m_Right(), 
-    m_WorldUp(0.0f, 1.0f, 0.0f), m_MouseSenstivity(senstivity), m_EulerAngles(270.0f, 0.0f, 0.0f), m_InputBindings(CameraInputBindings::Create<DefaultCameraInputBindings>())
+    m_WorldUp(0.0f, 1.0f, 0.0f), m_MouseSenstivity(senstivity), m_EulerAngles(270.0f, 0.0f, 0.0f), m_InputBindings(CameraInputBindings::Create<DefaultCameraInputBindings>()),
+    m_PreviousMousePos(Input::GetMousePosition())
 {
 }
 

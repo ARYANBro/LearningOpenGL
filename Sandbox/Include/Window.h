@@ -10,6 +10,7 @@ class Window
 public:
     using MouseMovedCallbackFunction = std::function<void(double, double)>;
     using MouseScrolledCallbackFunction = std::function<void(double, double)>;
+    using KeyCallbackFunction = std::function<void(int, int)>;
 
 public:
     Window(std::uint_fast32_t width = 800, std::uint_fast32_t height = 600, const std::string& name = "Window") noexcept;
@@ -17,9 +18,11 @@ public:
 
     bool IsClosed() const noexcept;
     void PollEvents() const noexcept;
+    void SwapBuffers() const noexcept;
 
     void SetMouseMovedCallback(const MouseMovedCallbackFunction& mouseMovedCallback) noexcept;
     void SetMouseScrolledCallback(const MouseScrolledCallbackFunction& mouseScrolledCallbac) noexcept;
+    void SetKeyCallback(const KeyCallbackFunction& keyCallback) noexcept;
 
     const GLFWwindow* GetHandle() const noexcept { return m_WindowHandle; }
     GLFWwindow* GetHandle() noexcept { return m_WindowHandle; }
@@ -32,6 +35,7 @@ private:
     {
         MouseMovedCallbackFunction MouseMovedCallback;
         MouseScrolledCallbackFunction MouseScrolledCallback;
+        KeyCallbackFunction KeyCallback;
     };
 
 private:

@@ -34,9 +34,13 @@ in vec3 v_LightPosition;
 uniform vec3 u_ObjectColor;
 uniform vec3 u_LightColor;
 
-uniform int u_Mode = 0;
 uniform float u_SpecularStrength = 1.0f;
 uniform int u_Shininess = 16;
+uniform float u_AmbientStrength;
+
+uniform bool u_EnableDiffuse;
+uniform bool u_EnableSpecular;
+uniform bool u_EnableAmbient;
 
 vec3 CalculateAmbient(float strength, vec3 color)
 {
@@ -69,20 +73,36 @@ void main()
     vec3 normal = normalize(v_Normal);
     vec3 lightDirection = normalize(v_LightPosition - v_FragPosition);
 
-    vec3 ambient = CalculateAmbient(0.1f, u_LightColor);
+    vec3 ambient = CalculateAmbient(u_AmbientStrength, u_LightColor);
     vec3 diffuse = CalculateDiffuse(lightDirection, v_FragPosition, normal, u_LightColor);
     vec3 specular = CalculateSpecular(v_FragPosition, normal, lightDirection, u_SpecularStrength, u_Shininess);
 
-    vec3 color;
+    vec3 color = vec3(0.0f);
 
-    switch (u_Mode)
+    if (u_EnableAmbient || u_EnableDiffuse || u_EnableSpecular)
     {
-        case 0: color  = (diffuse + ambient + specular) * u_ObjectColor; break;
-        case 1: color = diffuse * u_ObjectColor; break;
-        case 2: color = ambient * u_ObjectColor; break;
-        case 3: color = specular * u_ObjectColor; break;
-        case 4: color = normal; break;
+        if (u_EnableAmbient)
+        {
+            color += ambient;
+        }
+
+        if (u_EnableDiffuse)
+        {
+            color += diffuse;
+        }
+
+        if (u_EnableSpecular)
+        {
+            color += specular;
+        }
+
+        color *= u_ObjectColor;
     }
+    else
+    {
+        color = u_ObjectColor * u_LightColor;
+    }
+    
 
     fragColor = vec4(color, 1.0f);
 }

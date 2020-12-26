@@ -28,6 +28,7 @@ target_link_libraries(${PROJECT_NAME}
     Glad
     StbImage
     glm
+    ImGui
 )
 
 target_include_directories(${PROJECT_NAME}

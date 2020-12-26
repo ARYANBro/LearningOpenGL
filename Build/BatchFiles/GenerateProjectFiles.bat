@@ -33,7 +33,6 @@ if not "%~1" == "" (
     goto:InvalidConfiguration
 )
 
-
 :Generate
 
 set options=-DCMAKE_BUILD_TYPE=%CMAKE_BUILD_TYPE%
@@ -46,7 +45,7 @@ if not "%~2" == "" (
 )
     echo Generating %CMAKE_BUILD_TYPE% configuration
 
-    call ThirdParty\cmake\bin\cmake.exe %options% --G%generator% -S %~dp0..\..\ -B Binaries
+    call ThirdParty\cmake\bin\cmake.exe %options% -G%generator% -S %~dp0..\..\ -B Binaries
     goto:Exit
 
 :InvalidConfiguration

@@ -30,7 +30,8 @@ public:
     void SetInt(const std::string& name, int value) const;
     void SetBool(const std::string& name, bool value) const;
     void SetFloat(const std::string& name, float value) const;
-    void SetFloat3(const std::string& name, const glm::vec3& value) const;
+    void SetFloat3(const std::string& name, glm::vec3 value) const;
+    void SetFloat4(const std::string& name, glm::vec4 value) const;
 
 private:
     unsigned int m_RendererID;

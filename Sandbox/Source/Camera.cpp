@@ -50,7 +50,7 @@ Camera::Camera(const std::shared_ptr<CameraInputBindings>& inputBindings) noexce
     UpdateView();
 }
 
-void Camera::Update(DeltaTime delta) noexcept
+void Camera::OnUpdate(DeltaTime delta) noexcept
 {
     UpdatePosition(delta);
     UpdateRotation(delta);
@@ -94,7 +94,7 @@ void Camera::UpdateView() noexcept
 void Camera::UpdateRotation(DeltaTime delta) noexcept
 {
     glm::vec2 mouse = Input::GetMousePosition();
-    glm::vec2 offset = (mouse - m_PreviousMousePos) * delta.operator float();
+    glm::vec2 offset = (mouse - m_PreviousMousePos);
     m_PreviousMousePos = mouse;
 
     if ((Input::IsKeyPressed(GLFW_KEY_LEFT_ALT) && Input::IsMouseButtonPressed(GLFW_MOUSE_BUTTON_MIDDLE)) ||

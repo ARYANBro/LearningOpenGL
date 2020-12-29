@@ -12,7 +12,7 @@ class Mesh
 public:
     Mesh() noexcept = default;
     Mesh(const std::vector<float>& vertcies, const VertexLayout& layout, const std::shared_ptr<Shader>& shader);
-    Mesh(const std::shared_ptr<VertexBuffer>& vertexBuffer, const std::vector<float>& vertcies, const std::shared_ptr<Shader>& shader);
+    Mesh(const Mesh& mesh);
     
     void SetIndexData(const std::vector<unsigned int>& indcies) noexcept;
     void SetVertexData(const std::vector<float>& vertcies, const VertexLayout& layout);
@@ -25,7 +25,7 @@ public:
     const VertexArray& GetVertexArray() const noexcept { return m_VertexArray; }
     const std::shared_ptr<Shader>& GetShader() const noexcept { return m_Shader; }
 
-    template<typename MeshType, typename = std::enable_if_t<std::is_base_of_v<Mesh, MeshType>, MeshType>>
+    template<typename MeshType, typename = std::enable_if_t<std::is_base_of_v<Mesh, MeshType> || std::is_same_v<Mesh, MeshType>, MeshType>>
     static MeshType Share(const MeshType& mesh);
 
 private:
@@ -37,5 +37,5 @@ private:
 template<typename MeshType, typename>
 MeshType Mesh::Share(const MeshType& mesh) 
 {
-    return MeshType(mesh.m_VertexArray.GetVertexBuffer(0), mesh.GetVertexData(), mesh.GetShader());
+    return MeshType(mesh);
 }

@@ -6,6 +6,5 @@
 int main()
 {
     Sandbox sandbox(1600, 900);
-
     sandbox.Run();
 }

@@ -1,8 +1,8 @@
 #shader vertex
 #version 460 core
 
-layout (location = 0) in vec3 a_Position;
-layout (location = 1) in vec3 a_Normal;
+layout(location = 0) in vec3 a_Position;
+layout(location = 1) in vec3 a_Normal;
 
 out vec3 v_Normal;
 out vec3 v_FragPosition;
@@ -31,40 +31,47 @@ in vec3 v_Normal;
 in vec3 v_FragPosition;
 in vec3 v_LightPosition;
 
-uniform vec3 u_ObjectColor;
-uniform vec3 u_LightColor;
-
-uniform float u_SpecularStrength = 1.0f;
-uniform int u_Shininess = 16;
-uniform float u_AmbientStrength;
-
 uniform bool u_EnableDiffuse;
 uniform bool u_EnableSpecular;
 uniform bool u_EnableAmbient;
 
-vec3 CalculateAmbient(float strength, vec3 color)
+struct MaterialProperties
 {
-    return strength * color;
+    vec3 Ambient;
+    vec3 Diffuse;
+    vec3 Specular;
+    float Shininess;
+};
+
+struct LightProperties
+{
+    vec3 Ambient;
+    vec3 Diffuse;
+    vec3 Specular;
+};
+
+uniform LightProperties u_LightProps;
+uniform MaterialProperties u_MaterialProps;
+
+vec3 CalculateAmbient(vec3 color)
+{
+    return u_LightProps.Ambient * color;
 }
 
-vec3 CalculateDiffuse(vec3 lightDirection, vec3 fragPosition, vec3 normal, vec3 lightColor)
+vec3 CalculateDiffuse(vec3 lightDirection, vec3 fragPosition, vec3 normal, vec3 objectColor)
 {
-    float diffuseAmount = max(dot(normal, lightDirection), 0.0f);
-
-    return diffuseAmount * lightColor;
+    float diffuseAmount = clamp(dot(normal, lightDirection), 0.0f, 1.0f);
+    return u_LightProps.Diffuse * diffuseAmount * objectColor;
 }
 
-vec3 CalculateSpecular(vec3 fragPosition, vec3 normal, vec3 lightDirection, float strength, int shininess)
+vec3 CalculateSpecular(vec3 fragPosition, vec3 normal, vec3 lightDirection, float shininess, vec3 color)
 {
-    float normalDot = dot(normal, lightDirection);
-
-    if (normalDot > 0.0f)
+    if (dot(normal, lightDirection) > 0.0f)
     {
         vec3 viewDirection = normalize(-fragPosition);
         vec3 reflectDir = reflect(-lightDirection, normal);
-        float specularAmount = pow(max(dot(reflectDir, viewDirection), 0.0f), shininess);
-
-        return specularAmount * u_LightColor * max(strength, 0.0f);
+        float specularAmount = pow(clamp(dot(reflectDir, viewDirection), 0.0f, 1.0f), shininess);
+        return u_LightProps.Specular * specularAmount * color;
     }
 }
 
@@ -73,36 +80,9 @@ void main()
     vec3 normal = normalize(v_Normal);
     vec3 lightDirection = normalize(v_LightPosition - v_FragPosition);
 
-    vec3 ambient = CalculateAmbient(u_AmbientStrength, u_LightColor);
-    vec3 diffuse = CalculateDiffuse(lightDirection, v_FragPosition, normal, u_LightColor);
-    vec3 specular = CalculateSpecular(v_FragPosition, normal, lightDirection, u_SpecularStrength, u_Shininess);
+    vec3 ambient = CalculateAmbient(u_MaterialProps.Ambient);
+    vec3 diffuse = CalculateDiffuse(lightDirection, v_FragPosition, normal, u_MaterialProps.Diffuse);
+    vec3 specular = CalculateSpecular(v_FragPosition, normal, lightDirection, u_MaterialProps.Shininess, u_MaterialProps.Specular);
 
-    vec3 color = vec3(0.0f);
-
-    if (u_EnableAmbient || u_EnableDiffuse || u_EnableSpecular)
-    {
-        if (u_EnableAmbient)
-        {
-            color += ambient;
-        }
-
-        if (u_EnableDiffuse)
-        {
-            color += diffuse;
-        }
-
-        if (u_EnableSpecular)
-        {
-            color += specular;
-        }
-
-        color *= u_ObjectColor;
-    }
-    else
-    {
-        color = u_ObjectColor * u_LightColor;
-    }
-    
-
-    fragColor = vec4(color, 1.0f);
+    fragColor = vec4(ambient + diffuse + specular, 1.0f);
 }

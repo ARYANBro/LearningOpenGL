@@ -21,7 +21,7 @@ public:
     Camera(const glm::vec3& position, float speed, float senstivity) noexcept;
     Camera(const std::shared_ptr<CameraInputBindings>& inputBindings = CameraInputBindings::Create<DefaultCameraInputBindings>()) noexcept;
 
-    void Update(DeltaTime delta) noexcept;
+    void OnUpdate(DeltaTime delta) noexcept;
     void OnMouseMoved(double xPos, double yPos) noexcept;
 
     void SetPosition(const glm::vec3& position) noexcept { m_Position = position; }

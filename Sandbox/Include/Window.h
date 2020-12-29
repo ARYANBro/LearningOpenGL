@@ -40,15 +40,11 @@ private:
 
 private:
     GLFWwindow* m_WindowHandle;
-
-    std::uint_fast32_t m_Width;
-    std::uint_fast32_t m_Height;
+    std::uint_fast32_t m_Width, m_Height;
     std::string m_Name;
-
     WindowData m_Data;
 
 private:
     Window(const Window&) noexcept = default;
-    
     Window& operator=(const Window&) noexcept = default;
 };

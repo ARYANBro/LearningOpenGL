@@ -1,7 +1,7 @@
 #shader vertex
 #version 460 core
 
-layout (location = 0) in vec3 a_Position;
+layout(location = 0) in vec3 a_Position;
 
 uniform mat4 u_ModelMatrix;
 uniform mat4 u_ViewMatrix;
@@ -17,9 +17,9 @@ void main()
 
 out vec4 fragColor;
 
-uniform vec3 u_LightColor;
+uniform vec4 u_Color;
 
 void main()
 {
-    fragColor = vec4(u_LightColor, 1.0f);
+    fragColor = u_Color;
 }

@@ -62,7 +62,7 @@ void Window::SetKeyCallback(const KeyCallbackFunction& keyCallback) noexcept
 {
     m_Data.KeyCallback = keyCallback;
     
-    glfwSetKeyCallback(m_WindowHandle, [](GLFWwindow* window, int key, int scancode, int action, int mods)
+    glfwSetKeyCallback(m_WindowHandle, [](GLFWwindow* window, int key, [[maybe_unused]] int scancode, int action, int mods)
     {
         WindowData* data = static_cast<WindowData*>(glfwGetWindowUserPointer(window));
         data->KeyCallback(key, action);

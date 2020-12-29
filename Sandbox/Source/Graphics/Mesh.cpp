@@ -10,11 +10,11 @@ Mesh::Mesh(const std::vector<float>& vertcies, const VertexLayout& layout, const
     SetVertexData(vertcies, layout);
 }
 
-Mesh::Mesh(const std::shared_ptr<VertexBuffer>& vertexBuffer, const std::vector<float>& vertcies, const std::shared_ptr<Shader>& shader)
-    : m_VertexData(vertcies), m_VertexArray(), m_Shader(shader)
+Mesh::Mesh(const Mesh& mesh)
+    : m_VertexData(mesh.m_VertexData), m_VertexArray(mesh.m_VertexArray), m_Shader(mesh.m_Shader)
 {
-    SetVertexBuffer(vertexBuffer);
 }
+
 
 // TODO: Testing
 void Mesh::SetIndexData(const std::vector<unsigned int>& indcies) noexcept

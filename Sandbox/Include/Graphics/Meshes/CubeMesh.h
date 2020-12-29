@@ -14,8 +14,7 @@ class CubeMesh : public Mesh
 public:
     CubeMesh(const std::shared_ptr<Shader>& shader = Shader::Create());
 
-private:
-    CubeMesh(const std::shared_ptr<VertexBuffer>& vertexBuffer, const std::vector<float>& vertexData, const std::shared_ptr<Shader>& shader = Shader::Create());
+    CubeMesh(const Mesh& cube);
     
 private:
     using Mesh::SetVertexData;

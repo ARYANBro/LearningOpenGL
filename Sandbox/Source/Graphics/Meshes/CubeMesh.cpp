@@ -49,7 +49,7 @@ CubeMesh::CubeMesh(const std::shared_ptr<Shader>& shader)
 {
 }
 
-CubeMesh::CubeMesh(const std::shared_ptr<VertexBuffer>& vertexBuffer, const std::vector<float>& vertexData, const std::shared_ptr<Shader>& shader)
-    : Mesh(vertexBuffer, vertexData, shader)
+CubeMesh::CubeMesh(const Mesh& cube)
+    : Mesh(cube)
 {
 }
